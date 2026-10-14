@@ -404,12 +404,20 @@ public class Iec608705104TagParser {
         return plcValue;
     }
 
+    /**
+     * Fork: upstream 0.13.1 returned the raw unsigned 16 bit field as UINT. A normalized
+     * value is a signed fraction, see {@link ValueConversions#normalizedFromRaw(int)}.
+     */
     public static PlcValueAdapter processNormalizedValue(NormalizedValue nva) {
-        return PlcUINT.of(nva.getValue());
+        return PlcREAL.of((float) ValueConversions.normalizedFromRaw(nva.getValue()));
     }
 
+    /**
+     * Fork: upstream 0.13.1 returned UINT, which turned negative values into large positive
+     * ones. A scaled value is a signed 16 bit integer.
+     */
     public static PlcValueAdapter processScaledValue(ScaledValue sva) {
-        return PlcUINT.of(sva.getValue());
+        return PlcINT.of(sva.getValue());
     }
 
     public static PlcValueAdapter processBinaryCounterReading(BinaryCounterReading bcr) {

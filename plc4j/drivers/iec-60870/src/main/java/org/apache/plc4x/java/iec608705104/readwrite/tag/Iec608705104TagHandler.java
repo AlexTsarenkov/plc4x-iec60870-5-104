@@ -16,23 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.plc4x.java.iec608705104.readwrite.tag;
 
 import org.apache.plc4x.java.api.model.PlcQuery;
 import org.apache.plc4x.java.api.model.PlcTag;
 import org.apache.plc4x.java.spi.connection.PlcTagHandler;
 
+/**
+ * Turns the address strings of read, write and subscription requests into
+ * {@link Iec608705104Tag}s. PLC4X calls this while the request is being built, so a
+ * malformed address fails early with a {@code PlcInvalidTagException}.
+ */
 public class Iec608705104TagHandler implements PlcTagHandler {
 
     @Override
     public PlcTag parseTag(String tagAddress) {
-        return new Iec608705104Tag(0, 0);
+        return Iec608705104Tag.of(tagAddress);
     }
 
     @Override
     public PlcQuery parseQuery(String query) {
-        return null;
+        throw new UnsupportedOperationException("Browsing is not supported by the IEC 60870-5-104 driver");
     }
 
 }

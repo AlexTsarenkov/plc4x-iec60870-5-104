@@ -32,15 +32,15 @@ public class ManualTest {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             shutdown.complete(null);
         }));
-        try (PlcConnection plcConnection = PlcDriverManager.getDefault().getConnectionManager().getConnection("iec-60870-5-104://192.168.23.10")) {
+        try (PlcConnection plcConnection = PlcDriverManager.getDefault().getConnectionManager().getConnection("iec-60870-5-104:tcp://192.168.23.10")) {
             if(!plcConnection.getMetadata().isSubscribeSupported()) {
                 throw new RuntimeException("Subscription not supported");
             }
 
-            plcConnection.subscriptionRequestBuilder().addChangeOfStateTagAddress("all", "*").setConsumer(plcSubscriptionEvent -> {
+            plcConnection.subscriptionRequestBuilder().addChangeOfStateTagAddress("all", "*/*").setConsumer(plcSubscriptionEvent -> {
                 for (String tagName : plcSubscriptionEvent.getTagNames()) {
                     Iec608705104Tag tag = (Iec608705104Tag) plcSubscriptionEvent.getTag(tagName);
-                    System.out.printf("TS: %s, Addr: %d:%d, Value; %s%n", plcSubscriptionEvent.getTimestamp().toString(), tag.getAdsuAddress(), tag.getObjectAddress(), plcSubscriptionEvent.getPlcValue(tagName).toString());
+                    System.out.printf("TS: %s, Addr: %d:%d, Value; %s%n", plcSubscriptionEvent.getTimestamp().toString(), tag.getAsduAddress(), tag.getObjectAddress(), plcSubscriptionEvent.getPlcValue(tagName).toString());
                 }
             }).build().execute();
 

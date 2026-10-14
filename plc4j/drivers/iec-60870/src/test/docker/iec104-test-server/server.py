@@ -88,7 +88,9 @@ m_single.value = False
 def mirror_to(target):
     """Command callback that copies the received value to a monitoring point."""
 
-    def on_receive(point: c104.Point, previous_info, message) -> c104.ResponseState:
+    # c104 checks the annotations of callbacks, so they must be complete.
+    def on_receive(point: c104.Point, previous_info: c104.Information,
+                   message: c104.IncomingMessage) -> c104.ResponseState:
         log(f"command {point.type} IOA={point.io_address} value={point.value} -> IOA {target.io_address}")
         target.value = point.value
         target.transmit(cause=c104.Cot.RETURN_INFO_REMOTE)
@@ -97,7 +99,8 @@ def mirror_to(target):
     return on_receive
 
 
-def reject(point: c104.Point, previous_info, message) -> c104.ResponseState:
+def reject(point: c104.Point, previous_info: c104.Information,
+           message: c104.IncomingMessage) -> c104.ResponseState:
     log(f"command {point.type} IOA={point.io_address} value={point.value} -> rejected")
     return c104.ResponseState.FAILURE
 

@@ -74,8 +74,15 @@ jobs:
           docker build -t iec104-test-server plc4j/drivers/iec-60870/src/test/docker/iec104-test-server \
             2>&1 | tee ci-results/02-test-server-build.log
           docker run -d --name iec104-test-server -p 2404:2404 iec104-test-server
+          # Wait for the server's own "listening" line: the port alone is not enough,
+          # Docker's port proxy accepts connections even when the container has died.
           for i in $(seq 1 30); do
-            if (echo > /dev/tcp/127.0.0.1/2404) 2>/dev/null; then echo "test server is up"; exit 0; fi
+            if docker logs iec104-test-server 2>&1 | grep -q "listening"; then
+              echo "test server is up"; docker logs iec104-test-server; exit 0
+            fi
+            if [ "$(docker inspect -f '{{.State.Running}}' iec104-test-server)" != "true" ]; then
+              break
+            fi
             sleep 1
           done
           docker logs iec104-test-server

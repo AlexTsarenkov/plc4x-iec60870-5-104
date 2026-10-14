@@ -35,10 +35,14 @@ import java.util.function.Consumer;
 import java.util.function.ToIntFunction;
 
 /**
- * Implementation of the ADS protocol, based on:
- * - ADS Protocol
- * - TCP
- * - Serial
+ * PLC4X driver for IEC 60870-5-104, protocol code {@code iec-60870-5-104}.
+ *
+ * <p>Connection string: {@code iec-60870-5-104:tcp://<host>[:2404][?<options>]}, options
+ * see {@link Iec608705014Configuration}.
+ *
+ * <p>This class only wires the driver into PLC4X: it declares what the driver can do,
+ * which configuration classes it uses and how the Netty pipeline is built. The protocol
+ * itself lives in {@link Iec608705104Protocol}.
  */
 public class Iec60870514PlcDriver extends GeneratedDriverBase<APDU> {
 
@@ -50,6 +54,24 @@ public class Iec60870514PlcDriver extends GeneratedDriverBase<APDU> {
     @Override
     public String getProtocolName() {
         return "IEC 60870-5-104";
+    }
+
+    /**
+     * Fork: reads are answered from the value cache or with read commands (C_RD_NA_1),
+     * see {@link Iec608705014Configuration#getReadMode()}.
+     */
+    @Override
+    protected boolean canRead() {
+        return true;
+    }
+
+    /**
+     * Fork: writes are sent as set point or single commands, see
+     * {@link org.apache.plc4x.java.iec608705104.readwrite.protocol.Iec104Commands}.
+     */
+    @Override
+    protected boolean canWrite() {
+        return true;
     }
 
     @Override
@@ -115,7 +137,12 @@ public class Iec60870514PlcDriver extends GeneratedDriverBase<APDU> {
     public static class CorruptPackageCleaner implements Consumer<ByteBuf> {
         @Override
         public void accept(ByteBuf byteBuf) {
-            while (byteBuf.getUnsignedByte(0) != APDU.STARTBYTE) {
+            // Fork: upstream read the byte at absolute index 0 instead of at the reader index
+            // and did not check for the end of the buffer.
+            // When this runs, the codec has already consumed the frame that failed to parse
+            // (see GeneratedDriverByteToMessageCodec.decode), so it only has to skip bytes
+            // up to the next start byte.
+            while (byteBuf.isReadable() && byteBuf.getUnsignedByte(byteBuf.readerIndex()) != APDU.STARTBYTE) {
                 // Just consume the bytes till the next possible start position.
                 byteBuf.readByte();
             }
