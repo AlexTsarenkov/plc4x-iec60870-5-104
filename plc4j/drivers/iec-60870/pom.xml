@@ -27,6 +27,14 @@
   </parent>
 
   <artifactId>plc4j-driver-iec-60870</artifactId>
+  <!--
+    Fork: own version, so that this build can never be confused with the official
+    org.apache.plc4x:plc4j-driver-iec-60870:0.13.1 from Maven Central. Everything else
+    (parent poms, plc4j-api, plc4j-spi, plc4j-transport-tcp) stays the released 0.13.1,
+    which is why the driver can be built on its own. Bump the last number for every
+    release of the fork, see MAINTENANCE.md, "Versions".
+  -->
+  <version>0.13.1-iec104.1</version>
 
   <name>PLC4J: Driver: IEC-60870</name>
   <description>Implementation of a PLC4X driver for the IEC 60870-5-104 protocol.</description>

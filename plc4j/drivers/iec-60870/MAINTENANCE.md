@@ -129,23 +129,39 @@ event loop. Поэтому синхронизация не нужна. Нару�
 
 ### Локально
 
-Нужны JDK 17+, Maven 3.9 (есть `./mvnw`), доступ к Maven Central.
+Нужны JDK 17+ и доступ к Maven Central. Maven ставить не обязательно, в корне
+репозитория есть `./mvnw` (`mvnw.cmd` на Windows). Все команды выполняются из корня
+репозитория.
+
+Драйвер собирается **отдельно**: остальные модули PLC4X 0.13.1 (родительские pom,
+`plc4j-api`, `plc4j-spi`, `plc4j-transport-tcp`) берутся готовыми из Maven Central.
 
 ```bash
-# один раз: модули, от которых зависит драйвер
-./mvnw -P with-java -pl plc4j/drivers/iec-60870 -am install -DskipTests -Drat.skip=true
+# собрать, прогнать тесты и положить в локальный репозиторий (~/.m2)
+./mvnw -P with-java -pl plc4j/drivers/iec-60870 install
 
-# тесты драйвера (без Docker)
-./mvnw -P with-java -pl plc4j/drivers/iec-60870 test -Drat.skip=true
+# то же без тестов (быстро)
+./mvnw -P with-java -pl plc4j/drivers/iec-60870 install -DskipTests
 
 # плюс тесты совместимости против c104 (нужен запущенный тестовый сервер)
 docker build -t iec104-test-server plc4j/drivers/iec-60870/src/test/docker/iec104-test-server
 docker run -d --rm -p 2404:2404 --name iec104-test-server iec104-test-server
-./mvnw -P with-java -pl plc4j/drivers/iec-60870 verify -Drat.skip=true -Diec104.it.host=127.0.0.1
+./mvnw -P with-java -pl plc4j/drivers/iec-60870 install -Diec104.it.host=127.0.0.1
 ```
 
-Если `-Drat.skip` не указать, Apache RAT потребует лицензионный заголовок в каждом новом
-файле. Все файлы форка его содержат, так что можно и без флага.
+Результат: `plc4j/drivers/iec-60870/target/plc4j-driver-iec-60870-<версия>.jar` и он же в
+`~/.m2/repository/org/apache/plc4x/plc4j-driver-iec-60870/<версия>/`.
+
+`-P with-java` обязателен: без него корневой pom не включает модули Java. Apache RAT
+проверяет лицензионный заголовок в каждом файле; все файлы форка его содержат. Если
+RAT мешает при экспериментах, добавьте `-Drat.skip=true`.
+
+### Версии
+
+У модуля своя версия, `0.13.1-iec104.N` (`<version>` в `pom.xml` драйвера), чтобы сборку
+форка нельзя было спутать с официальным `0.13.1` из Maven Central. Родитель и
+зависимости остаются `0.13.1`. Для каждого выпуска форка увеличивайте `N`, и отмечайте
+выпуск тегом, например `git tag iec104-0.13.1-iec104.1`.
 
 ### Тесты
 

@@ -61,11 +61,14 @@ jobs:
           java-version: '17'
           cache: maven
 
-      - name: Build dependencies of the driver (no tests)
+      # The driver is built on its own: its dependencies (plc4j-api, plc4j-spi, ...) are
+      # the released 0.13.1 artifacts from Maven Central. This is the same command a
+      # developer uses locally, see MAINTENANCE.md, "Building".
+      - name: Resolve dependencies
         run: |
           set -o pipefail
           mkdir -p ci-results
-          ./mvnw $MAVEN_ARGS -pl plc4j/drivers/iec-60870 -am install -DskipTests \
+          ./mvnw $MAVEN_ARGS -pl plc4j/drivers/iec-60870 dependency:resolve \
             2>&1 | tee ci-results/01-build-dependencies.log
 
       - name: Start IEC 104 test server (c104)
@@ -129,3 +132,10 @@ jobs:
         with:
           name: iec104-ci-results
           path: ci-results
+
+      # The built driver jar, downloadable from the run page.
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: plc4j-driver-iec-60870
+          path: plc4j/drivers/iec-60870/target/plc4j-driver-iec-60870-*.jar

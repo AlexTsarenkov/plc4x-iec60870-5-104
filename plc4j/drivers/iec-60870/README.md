@@ -39,6 +39,28 @@
 | Browse | нет |
 | Автоматическое переподключение | нет, это задача приложения |
 
+## Как подключить к своему проекту
+
+Драйвер публикуется как `org.apache.plc4x:plc4j-driver-iec-60870:0.13.1-iec104.1`. Он
+зависит от официальных `plc4j-api`, `plc4j-spi` и `plc4j-transport-tcp` версии 0.13.1 из
+Maven Central, они подтянутся сами.
+
+1. Соберите и установите драйвер в локальный репозиторий, см. MAINTENANCE.md, «Сборка».
+2. В проекте:
+
+```xml
+<dependency>
+  <groupId>org.apache.plc4x</groupId>
+  <artifactId>plc4j-driver-iec-60870</artifactId>
+  <version>0.13.1-iec104.1</version>
+</dependency>
+```
+
+Официального `plc4j-driver-iec-60870:0.13.1` в проекте быть не должно, даже
+транзитивно (например, через `plc4j-drivers-all`): оба регистрируются под кодом
+`iec-60870-5-104`, и какой из них выберет `PlcDriverManager`, не определено. Проверка:
+`mvn dependency:tree -Dincludes=org.apache.plc4x:plc4j-driver-iec-60870`.
+
 ## Подключение
 
 ```
