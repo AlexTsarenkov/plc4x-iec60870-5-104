@@ -1,0 +1,124 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+# Builds and tests only the IEC 60870-5-104 driver (plc4j/drivers/iec-60870)
+# of this fork. See plc4j/drivers/iec-60870/MAINTENANCE.md, section "CI".
+#
+# 1. Builds the modules the driver depends on (no tests).
+# 2. Starts the c104 test server from src/test/docker/iec104-test-server.
+# 3. Runs the driver's unit tests (surefire, *Test) and the interop
+#    integration tests against the test server (failsafe, *IT).
+# 4. Publishes logs and test reports to the orphan branch "ci-results", so the
+#    results can be read with plain git (git fetch origin ci-results).
+
+name: IEC 60870-5-104 driver
+
+on:
+  push:
+    branches: [ "iec104-*" ]
+    paths:
+      - plc4j/drivers/iec-60870/**
+      - protocols/iec-60870/**
+      - .github/workflows/iec104-driver.yml
+  workflow_dispatch:
+
+permissions:
+  # Needed to push the "ci-results" branch.
+  contents: write
+
+concurrency:
+  group: iec104-driver-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      MAVEN_ARGS: -B -ntp -P with-java -Drat.skip=true -Dmaven.javadoc.skip=true -Dspotbugs.skip=true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Build dependencies of the driver (no tests)
+        run: |
+          set -o pipefail
+          mkdir -p ci-results
+          ./mvnw $MAVEN_ARGS -pl plc4j/drivers/iec-60870 -am install -DskipTests \
+            2>&1 | tee ci-results/01-build-dependencies.log
+
+      - name: Start IEC 104 test server (c104)
+        run: |
+          set -o pipefail
+          docker build -t iec104-test-server plc4j/drivers/iec-60870/src/test/docker/iec104-test-server \
+            2>&1 | tee ci-results/02-test-server-build.log
+          docker run -d --name iec104-test-server -p 2404:2404 iec104-test-server
+          for i in $(seq 1 30); do
+            if (echo > /dev/tcp/127.0.0.1/2404) 2>/dev/null; then echo "test server is up"; exit 0; fi
+            sleep 1
+          done
+          docker logs iec104-test-server
+          echo "test server did not come up" >&2
+          exit 1
+
+      - name: Test the driver
+        run: |
+          set -o pipefail
+          ./mvnw $MAVEN_ARGS -pl plc4j/drivers/iec-60870 verify \
+            -Diec104.it.host=127.0.0.1 -Diec104.it.port=2404 \
+            2>&1 | tee ci-results/03-driver-test.log
+
+      - name: Collect results
+        if: always()
+        run: |
+          mkdir -p ci-results/reports
+          docker logs iec104-test-server > ci-results/04-test-server.log 2>&1 || true
+          cp -r plc4j/drivers/iec-60870/target/surefire-reports ci-results/reports/ 2>/dev/null || true
+          cp -r plc4j/drivers/iec-60870/target/failsafe-reports ci-results/reports/ 2>/dev/null || true
+          {
+            echo "sha:      ${GITHUB_SHA}"
+            echo "ref:      ${GITHUB_REF}"
+            echo "run:      ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "job:      ${{ job.status }}"
+            echo "finished: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          } > ci-results/SUMMARY.txt
+
+      - name: Publish results to branch ci-results
+        if: always()
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd ci-results
+          git init -q
+          git checkout -q -b ci-results
+          git add -A
+          git -c user.name="iec104-ci" -c user.email="iec104-ci@users.noreply.github.com" \
+            commit -q -m "CI results for ${GITHUB_SHA::8} (run ${GITHUB_RUN_ID})"
+          git push -q -f "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" ci-results
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iec104-ci-results
+          path: ci-results

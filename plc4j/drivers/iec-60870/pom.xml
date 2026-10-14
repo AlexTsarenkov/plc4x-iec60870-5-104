@@ -33,6 +33,12 @@
 
   <properties>
     <project.build.outputTimestamp>2025-08-24T18:14:38Z</project.build.outputTimestamp>
+    <!--
+      Fork: this driver is compiled for Java 17 (the runtime it is used on), while the
+      rest of PLC4X 0.13.1 stays on Java 11. The modules it depends on are Java 11
+      bytecode, which a Java 17 runtime loads without problems.
+    -->
+    <java.version>17</java.version>
   </properties>
 
   <build>
