@@ -334,10 +334,13 @@ public class Iec104TestStation implements AutoCloseable {
                         return;
                     case ACCEPT:
                     default:
-                        sendAsdu(mirror(request, CauseOfTransmission.CONFIRMATION_ACTIVATION_ACTCON, false));
+                        // Update first, so a test that got the ACT_CON sees the new value.
                         Point target = points.get(command.mirrorIoa());
                         if (target != null) {
                             points.put(command.mirrorIoa(), new Point(target.type(), commandValue(object)));
+                        }
+                        sendAsdu(mirror(request, CauseOfTransmission.CONFIRMATION_ACTIVATION_ACTCON, false));
+                        if (target != null) {
                             sendAsdu(monitoringAsdu(command.mirrorIoa(), CauseOfTransmission.FEEDBACK_CAUSED_BY_DISTANT_COMMAND_RETREM));
                         }
                         sendAsdu(mirror(request, CauseOfTransmission.TERMINATION_ACTIVATION_ACTTERM, false));
