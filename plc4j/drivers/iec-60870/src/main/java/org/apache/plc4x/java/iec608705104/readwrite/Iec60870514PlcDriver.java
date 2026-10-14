@@ -23,6 +23,7 @@ import org.apache.plc4x.java.spi.configuration.PlcConnectionConfiguration;
 import org.apache.plc4x.java.spi.configuration.PlcTransportConfiguration;
 import org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014Configuration;
 import org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014TcpTransportConfiguration;
+import org.apache.plc4x.java.iec608705104.readwrite.protocol.Iec104FrameDecoder;
 import org.apache.plc4x.java.iec608705104.readwrite.protocol.Iec608705104Protocol;
 import org.apache.plc4x.java.spi.connection.GeneratedDriverBase;
 import org.apache.plc4x.java.spi.connection.ProtocolStackConfigurer;
@@ -114,7 +115,8 @@ public class Iec60870514PlcDriver extends GeneratedDriverBase<APDU> {
 
     @Override
     protected ProtocolStackConfigurer<APDU> getStackConfigurer() {
-        return SingleProtocolStackConfigurer.builder(APDU.class, APDU::staticParse)
+        // Fork: Iec104FrameDecoder instead of APDU::staticParse, to support SQ=1 ASDUs.
+        return SingleProtocolStackConfigurer.builder(APDU.class, Iec104FrameDecoder::parse)
             .withPacketSizeEstimator(ByteLengthEstimator.class)
             .withCorruptPacketRemover(CorruptPackageCleaner.class)
             .withProtocol(Iec608705104Protocol.class)

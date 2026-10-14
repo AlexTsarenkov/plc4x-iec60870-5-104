@@ -29,6 +29,8 @@
     </encoder>
   </appender>
 
+  <!-- Fork: the driver's own decisions, useful when a test against a real station fails. -->
+  <logger name="org.apache.plc4x.java.iec608705104.readwrite.protocol" level="debug"/>
   <root level="info">
     <appender-ref ref="STDOUT" />
   </root>

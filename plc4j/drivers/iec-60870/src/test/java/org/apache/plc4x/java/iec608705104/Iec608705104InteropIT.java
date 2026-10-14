@@ -169,7 +169,11 @@ class Iec608705104InteropIT {
                 .addTagAddress("unknown", "1/12345", 1.0f)
                 .build().execute().get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
             assertEquals(PlcResponseCode.REMOTE_ERROR, response.getResponseCode("rejected"));
-            assertEquals(PlcResponseCode.NOT_FOUND, response.getResponseCode("unknown"));
+            // lib60870 answers a command for an unknown IOA with a negative ACT_CON rather
+            // than with cause 47 (unknown IOA); both are valid ways for a station to refuse.
+            PlcResponseCode unknown = response.getResponseCode("unknown");
+            assertTrue(unknown == PlcResponseCode.NOT_FOUND || unknown == PlcResponseCode.REMOTE_ERROR,
+                "unknown IOA must be refused, was " + unknown);
         }
     }
 

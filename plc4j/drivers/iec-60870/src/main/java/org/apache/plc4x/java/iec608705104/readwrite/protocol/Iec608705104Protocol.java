@@ -320,8 +320,8 @@ public class Iec608705104Protocol extends Plc4xProtocolBase<APDU>
                 onEndOfInitialisation(asdu);
                 return;
             case READ_COMMAND:
-                // A read command only comes back when the station rejects it; a successful
-                // read is answered with the monitoring data itself.
+                // A successful read is answered with the monitoring data itself; a read
+                // command coming back is either a rejection or a mere confirmation.
                 onReadRejected(asdu);
                 return;
             default:
@@ -395,7 +395,13 @@ public class Iec608705104Protocol extends Plc4xProtocolBase<APDU>
 
     private void onReadRejected(ASDU asdu) {
         PlcResponseCode code = responseCodeOf(asdu);
-        PlcResponseCode failure = code == null || code == PlcResponseCode.OK ? PlcResponseCode.NOT_FOUND : code;
+        if (code == null || code == PlcResponseCode.OK) {
+            // Not a rejection. Some stations (lib60870) confirm a read command before
+            // sending the data; the data with cause "request" answers the read.
+            LOGGER.debug("Ignoring read command echo with cause {}", asdu.getCauseOfTransmission());
+            return;
+        }
+        PlcResponseCode failure = code;
         for (InformationObject object : asdu.getInformationObjects()) {
             ObjectKey key = new ObjectKey(asdu.getAsduAddressField(), object.getAddress());
             completeAll(pendingReads.remove(key), item(failure, null));
