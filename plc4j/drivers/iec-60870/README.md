@@ -61,6 +61,82 @@ Maven Central, они подтянутся сами.
 `iec-60870-5-104`, и какой из них выберет `PlcDriverManager`, не определено. Проверка:
 `mvn dependency:tree -Dincludes=org.apache.plc4x:plc4j-driver-iec-60870`.
 
+### Публикация в корпоративный Nexus
+
+Драйвер выкладывается в Nexus один раз на каждую версию, из клона форка:
+
+```bash
+./mvnw -P with-java -pl plc4j/drivers/iec-60870 deploy -DskipTests \
+  -DaltDeploymentRepository=corp-nexus::https://<nexus>/repository/<releases>/
+```
+
+Учётные данные — в `~/.m2/settings.xml` того, кто выкладывает, с тем же id:
+
+```xml
+<servers>
+  <server>
+    <id>corp-nexus</id>
+    <username>...</username>
+    <password>...</password>
+  </server>
+</servers>
+```
+
+Выкладываются jar, sources jar, pom и kar (архив для Karaf, проекту он не нужен).
+Родительские pom PLC4X 0.13.1 и `plc4j-api`/`plc4j-spi`/`plc4j-transport-tcp` выкладывать не
+нужно, если Nexus проксирует Maven Central (обычно так и есть).
+
+Release-репозиторий Nexus не даёт перезаписать версию. Для каждой новой сборки
+увеличивайте номер (`0.13.1-iec104.2`, ...), см. MAINTENANCE.md, «Версии».
+
+### Сборка fat jar через maven-shade-plugin
+
+PLC4X находит драйверы и транспорты через `ServiceLoader`, то есть через файлы
+`META-INF/services/...` в jar'ах (`org.apache.plc4x.java.api.PlcDriver`,
+`org.apache.plc4x.java.spi.transport.Transport`). Shade по умолчанию оставляет только
+один из одноимённых файлов, и тогда `PlcDriverManager` не найдёт драйвер для
+`iec-60870-5-104` или TCP-транспорт, хотя классы в jar есть. Нужен
+`ServicesResourceTransformer`, он склеивает эти файлы:
+
+```xml
+<plugin>
+  <groupId>org.apache.maven.plugins</groupId>
+  <artifactId>maven-shade-plugin</artifactId>
+  <executions>
+    <execution>
+      <phase>package</phase>
+      <goals><goal>shade</goal></goals>
+      <configuration>
+        <transformers>
+          <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+          <!-- ваш ManifestResourceTransformer с mainClass и прочие -->
+        </transformers>
+        <filters>
+          <filter>
+            <!-- подписи чужих jar'ов в fat jar недействительны -->
+            <artifact>*:*</artifact>
+            <excludes>
+              <exclude>META-INF/*.SF</exclude>
+              <exclude>META-INF/*.DSA</exclude>
+              <exclude>META-INF/*.RSA</exclude>
+            </excludes>
+          </filter>
+        </filters>
+      </configuration>
+    </execution>
+  </executions>
+</plugin>
+```
+
+Проверить готовый jar:
+
+```bash
+unzip -p target/<ваш>.jar META-INF/services/org.apache.plc4x.java.api.PlcDriver
+# должна быть строка org.apache.plc4x.java.iec608705104.readwrite.Iec60870514PlcDriver
+unzip -p target/<ваш>.jar META-INF/services/org.apache.plc4x.java.spi.transport.Transport
+# должна быть строка org.apache.plc4x.java.transport.tcp.TcpTransport
+```
+
 ## Подключение
 
 ```
