@@ -24,7 +24,6 @@ import org.apache.plc4x.java.api.value.PlcValue;
 import org.apache.plc4x.java.iec608705104.readwrite.*;
 import org.apache.plc4x.java.spi.values.*;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -259,18 +258,23 @@ public class Iec608705104TagParser {
             }
             case EVENT_OF_PROTECTION_EQUIPMENT_WITH_TIME_TAG: {
                 InformationObjectWithTreeByteTime_EVENT_OF_PROTECTION_EQUIPMENT castedObject = (InformationObjectWithTreeByteTime_EVENT_OF_PROTECTION_EQUIPMENT) informationObject;
-                // TODO: Implement
-                break;
+                PlcValueAdapter plcValue = processSingleEventOfProtectionEquipment(castedObject.getSep());
+                plcValue.addMetaData("elapsedTime", PlcUINT.of(castedObject.getCp16Time2a().getMilliseconds()));
+                return plcValue;
             }
             case PACKED_START_EVENTS_OF_PROTECTION_EQUIPMENT_WITH_TIME_TAG: {
                 InformationObjectWithTreeByteTime_PACKED_START_EVENTS_OF_PROTECTION_EQUIPMENT castedObject = (InformationObjectWithTreeByteTime_PACKED_START_EVENTS_OF_PROTECTION_EQUIPMENT) informationObject;
-                // TODO: Implement
-                break;
+                PlcValueAdapter plcValue = processStartEventsOfProtectionEquipment(castedObject.getSpe());
+                processQualityDescriptorForPointsOfProtectionEquipment(castedObject.getQdp(), plcValue);
+                plcValue.addMetaData("relayDurationTime", PlcUINT.of(castedObject.getCp16Time2a().getMilliseconds()));
+                return plcValue;
             }
             case PACKED_OUTPUT_CIRCUIT_INFORMATION_OF_PROTECTION_EQUIPMENT_WITH_TIME_TAG: {
                 InformationObjectWithTreeByteTime_PACKED_OUTPUT_CIRCUIT_INFORMATION_OF_PROTECTION_EQUIPMENT castedObject = (InformationObjectWithTreeByteTime_PACKED_OUTPUT_CIRCUIT_INFORMATION_OF_PROTECTION_EQUIPMENT) informationObject;
-                // TODO: Implement
-                break;
+                PlcValueAdapter plcValue = processOutputCircuitInformation(castedObject.getOci());
+                processQualityDescriptorForPointsOfProtectionEquipment(castedObject.getQdp(), plcValue);
+                plcValue.addMetaData("relayOperatingTime", PlcUINT.of(castedObject.getCp16Time2a().getMilliseconds()));
+                return plcValue;
             }
 
 
@@ -317,19 +321,24 @@ public class Iec608705104TagParser {
                 return processBinaryCounterReading(castedObject.getBcr());
             }
             case EVENT_OF_PROTECTION_EQUIPMENT_WITH_TIME_TAG_CP56TIME2A: {
-                InformationObjectWithSevenByteTime_EVENT_OF_PROTECTION_EQUIPMENT castedObject = (InformationObjectWithSevenByteTime_EVENT_OF_PROTECTION_EQUIPMENT ) informationObject;
-                // TODO: Implement
-                break;
+                InformationObjectWithSevenByteTime_EVENT_OF_PROTECTION_EQUIPMENT castedObject = (InformationObjectWithSevenByteTime_EVENT_OF_PROTECTION_EQUIPMENT) informationObject;
+                PlcValueAdapter plcValue = processSingleEventOfProtectionEquipment(castedObject.getSep());
+                plcValue.addMetaData("elapsedTime", PlcUINT.of(castedObject.getCp16Time2a().getMilliseconds()));
+                return plcValue;
             }
             case PACKED_START_EVENTS_OF_PROTECTION_EQUIPMENT_WITH_TIME_TAG_CP56TIME2A: {
-                InformationObjectWithSevenByteTime_PACKED_START_EVENTS_OF_PROTECTION_EQUIPMENT castedObject = (InformationObjectWithSevenByteTime_PACKED_START_EVENTS_OF_PROTECTION_EQUIPMENT ) informationObject;
-                // TODO: Implement
-                break;
+                InformationObjectWithSevenByteTime_PACKED_START_EVENTS_OF_PROTECTION_EQUIPMENT castedObject = (InformationObjectWithSevenByteTime_PACKED_START_EVENTS_OF_PROTECTION_EQUIPMENT) informationObject;
+                PlcValueAdapter plcValue = processStartEventsOfProtectionEquipment(castedObject.getSpe());
+                processQualityDescriptorForPointsOfProtectionEquipment(castedObject.getQdp(), plcValue);
+                plcValue.addMetaData("relayDurationTime", PlcUINT.of(castedObject.getCp16Time2a().getMilliseconds()));
+                return plcValue;
             }
             case PACKED_OUTPUT_CIRCUIT_INFORMATION_OF_PROTECTION_EQUIPMENT_WITH_TIME_TAG_CP56TIME2A: {
-                InformationObjectWithSevenByteTime_PACKED_OUTPUT_CIRCUIT_INFORMATION_OF_PROTECTION_EQUIPMENT castedObject = (InformationObjectWithSevenByteTime_PACKED_OUTPUT_CIRCUIT_INFORMATION_OF_PROTECTION_EQUIPMENT ) informationObject;
-                // TODO: Implement
-                break;
+                InformationObjectWithSevenByteTime_PACKED_OUTPUT_CIRCUIT_INFORMATION_OF_PROTECTION_EQUIPMENT castedObject = (InformationObjectWithSevenByteTime_PACKED_OUTPUT_CIRCUIT_INFORMATION_OF_PROTECTION_EQUIPMENT) informationObject;
+                PlcValueAdapter plcValue = processOutputCircuitInformation(castedObject.getOci());
+                processQualityDescriptorForPointsOfProtectionEquipment(castedObject.getQdp(), plcValue);
+                plcValue.addMetaData("relayOperatingTime", PlcUINT.of(castedObject.getCp16Time2a().getMilliseconds()));
+                return plcValue;
             }
             /*case SINGLE_COMMAND_WITH_TIME_TAG_CP56TIME2A: {
                 InformationObjectWithSevenByteTime_SINGLE_COMMAND castedObject = (InformationObjectWithSevenByteTime_SINGLE_COMMAND ) informationObject;
@@ -369,10 +378,12 @@ public class Iec608705104TagParser {
         return plcValue;
     }
 
+    /**
+     * Fork: the double point state as its code, 0 = intermediate, 1 = off, 2 = on,
+     * 3 = indeterminate. Upstream 0.13.1 returned a list of the two bits.
+     */
     public static PlcValueAdapter processDoublePointInformation(DoublePointInformation diq) {
-        boolean firstPoint = (diq.getDpiCode() & 0x01) != 0;
-        boolean secondPoint = (diq.getDpiCode() & 0x02) != 0;
-        PlcList plcValue = new PlcList(Arrays.asList(PlcBOOL.of(firstPoint), PlcBOOL.of(secondPoint)));
+        PlcValueAdapter plcValue = PlcUSINT.of(diq.getDpiCode());
         plcValue.addMetaData("invalid", PlcBOOL.of(diq.getInvalid()));
         plcValue.addMetaData("notTopical", PlcBOOL.of(diq.getNotTopical()));
         plcValue.addMetaData("substituted", PlcBOOL.of(diq.getSubstituted()));
@@ -380,14 +391,23 @@ public class Iec608705104TagParser {
         return plcValue;
     }
 
+    /**
+     * Fork: was not implemented (returned null, so the value was dropped). The 32 bits as
+     * DWORD.
+     */
     public static PlcValueAdapter processBinaryStateInformation(BinaryStateInformation bsi) {
-        // TODO: Implement
-        return null;
+        return new PlcDWORD(bsi.getBits());
     }
 
+    /**
+     * Fork: was not implemented. 16 single points ("status", bit i = point i) and their
+     * change detection bits ("changed"), as a struct of two WORDs.
+     */
     public static PlcValueAdapter processStatusChangeDetection(StatusChangeDetection scd) {
-        // TODO: Implement
-        return null;
+        Map<String, PlcValue> values = new HashMap<>();
+        values.put("status", new PlcWORD((int) (scd.getBits() & 0xFFFF)));
+        values.put("changed", new PlcWORD((int) ((scd.getBits() >>> 16) & 0xFFFF)));
+        return new PlcStruct(values);
     }
 
     public static void processQualityDescriptor(QualityDescriptor qds, PlcValueAdapter plcValue) {
@@ -398,8 +418,13 @@ public class Iec608705104TagParser {
         plcValue.addMetaData("overflow", PlcBOOL.of(qds.getOverflow()));
     }
 
+    /**
+     * Fork: the step position is a signed 7 bit number (-64..63); upstream returned the raw
+     * bits as unsigned.
+     */
     public static PlcValueAdapter processValueWithTransientStateIndication(ValueWithTransientStateIndication vti) {
-        PlcValueAdapter plcValue = PlcUSINT.of(vti.getValue());
+        int raw = vti.getValue() & 0x7F;
+        PlcValueAdapter plcValue = PlcSINT.of(raw >= 0x40 ? raw - 0x80 : raw);
         plcValue.addMetaData("transientState", PlcBOOL.of(vti.getTransientState()));
         return plcValue;
     }
@@ -437,6 +462,20 @@ public class Iec608705104TagParser {
         plcValue.addMetaData("blocked", PlcBOOL.of(sep.getBlocked()));
         plcValue.addMetaData("elapsedTimeInvalid", PlcBOOL.of(sep.getElapsedTimeInvalid()));
         return plcValue;
+    }
+
+    /**
+     * Fork: start events of protection equipment (SPE) as a struct of booleans.
+     */
+    public static PlcValueAdapter processStartEventsOfProtectionEquipment(StartEventsOfProtectionEquipment spe) {
+        Map<String, PlcValue> plcValues = new HashMap<>();
+        plcValues.put("generalStartOfOperation", PlcBOOL.of(spe.getGeneralStartOfOperation()));
+        plcValues.put("startOfOperationPhaseL1", PlcBOOL.of(spe.getStateOfOperationPhaseL1()));
+        plcValues.put("startOfOperationPhaseL2", PlcBOOL.of(spe.getStateOfOperationPhaseL2()));
+        plcValues.put("startOfOperationPhaseL3", PlcBOOL.of(spe.getStateOfOperationPhaseL3()));
+        plcValues.put("startOfOperationIE", PlcBOOL.of(spe.getStartOfOperationIE()));
+        plcValues.put("startOfOperationInReverseDirection", PlcBOOL.of(spe.getStartOfOperationInReverseDirection()));
+        return new PlcStruct(plcValues);
     }
 
     public static PlcValueAdapter processOutputCircuitInformation(OutputCircuitInformation oci) {

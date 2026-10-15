@@ -42,8 +42,6 @@ import org.apache.plc4x.java.iec608705104.readwrite.CauseOfTransmission;
 import org.apache.plc4x.java.iec608705104.readwrite.InformationObject;
 import org.apache.plc4x.java.iec608705104.readwrite.InformationObjectWithSevenByteTime;
 import org.apache.plc4x.java.iec608705104.readwrite.InformationObjectWithTreeByteTime;
-import org.apache.plc4x.java.iec608705104.readwrite.SevenOctetBinaryTime;
-import org.apache.plc4x.java.iec608705104.readwrite.ThreeOctetBinaryTime;
 import org.apache.plc4x.java.iec608705104.readwrite.TypeIdentification;
 import org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014Configuration;
 import org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014Configuration.ReadMode;
@@ -71,10 +69,10 @@ import org.apache.plc4x.java.spi.values.PlcValueAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -87,6 +85,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 /**
@@ -123,9 +122,21 @@ import java.util.function.Consumer;
  *
  * <h2>How answers are matched to requests</h2>
  * IEC 104 has no request ids. A command is confirmed by the station repeating the ASDU
- * with cause of transmission ACT_CON (7), so a pending write is identified by
+ * with cause of transmission ACT_CON (7), so a pending command is identified by
  * (type identification, common address, IOA); a read command by (common address, IOA) and
- * the cause "request" (5). Requests for the same key are answered in order.
+ * the cause "request" (5). Requests for the same key are answered in order. An answer from
+ * a station to a command sent to the broadcast address 65535 is matched to that command.
+ *
+ * <h2>Life of one command</h2>
+ * <pre>
+ *  [select-before-operate only]  select  ── ACT_CON ──┐
+ *                                                     ▼
+ *                                execute ── ACT_CON ──► done   (default)
+ *                                            └─ ACT_TERM ─► done (wait-for-termination)
+ * </pre>
+ * A step command of n steps runs this n times, one after the other. Each phase has its
+ * own timeout: {@code request-timeout} for ACT_CON, {@code termination-timeout-ms} for
+ * ACT_TERM. See {@link #executeCommand} and {@link PendingCommand}.
  */
 public class Iec608705104Protocol extends Plc4xProtocolBase<APDU>
     implements HasConfiguration<Iec608705014Configuration>, PlcSubscriber {
@@ -144,6 +155,17 @@ public class Iec608705104Protocol extends Plc4xProtocolBase<APDU>
     /** Type identifications 45..69 are commands in the control direction. */
     private static final int FIRST_COMMAND_TYPE = 45;
     private static final int LAST_COMMAND_TYPE = 69;
+    /** Type identifications 100..107 are system commands (interrogation, clock sync, test, ...). */
+    private static final int FIRST_SYSTEM_TYPE = 100;
+    private static final int LAST_SYSTEM_TYPE = 107;
+    /** Type identifications 110..113 are parameters (P_ME, P_AC). */
+    private static final int FIRST_PARAMETER_TYPE = 110;
+    private static final int LAST_PARAMETER_TYPE = 113;
+    /** Highest process command that may be terminated with ACT_TERM (C_BO_TA_1 = 64). */
+    private static final int LAST_TERMINATED_PROCESS_COMMAND = 64;
+
+    /** The broadcast common address. */
+    private static final int BROADCAST_ADDRESS = 0xFFFF;
 
     /** Metadata key: cause of transmission (numeric, see IEC 60870-5-101 7.2.3). */
     public static final String METADATA_CAUSE_OF_TRANSMISSION = "cot";
@@ -160,7 +182,59 @@ public class Iec608705104Protocol extends Plc4xProtocolBase<APDU>
     private record ObjectKey(int asduAddress, int objectAddress) {
     }
 
+    /**
+     * One command sent to the station and not answered yet.
+     *
+     * <p>States: waiting for ACT_CON ({@code confirmed == false}), then, only if
+     * {@code awaitTermination}, waiting for ACT_TERM ({@code confirmed == true}). The
+     * timeout is re-armed when the state changes. Only touched on the event loop.
+     */
+    private final class PendingCommand {
+        private final CommandKey key;
+        private final boolean awaitTermination;
+        private final String what;
+        private final CompletableFuture<PlcResponseCode> result = new CompletableFuture<>();
+        private boolean confirmed;
+        private ScheduledFuture<?> timeout;
+
+        private PendingCommand(CommandKey key, boolean awaitTermination, String what) {
+            this.key = key;
+            this.awaitTermination = awaitTermination;
+            this.what = what;
+        }
+
+        private void armTimeout(long millis, String waitingFor) {
+            if (timeout != null) {
+                timeout.cancel(false);
+            }
+            timeout = channel.eventLoop().schedule(() -> {
+                if (!result.isDone()) {
+                    LOGGER.warn("No {} from the station to the {} within {} ms", waitingFor, what, millis);
+                    finish(PlcResponseCode.REMOTE_ERROR);
+                }
+            }, millis, TimeUnit.MILLISECONDS);
+        }
+
+        /** Completes the command and removes it from the pending ones. */
+        private void finish(PlcResponseCode code) {
+            if (timeout != null) {
+                timeout.cancel(false);
+            }
+            Deque<PendingCommand> queue = pendingCommands.get(key);
+            if (queue != null) {
+                queue.remove(this);
+                if (queue.isEmpty()) {
+                    pendingCommands.remove(key);
+                }
+            }
+            result.complete(code);
+        }
+    }
+
     private Iec608705014Configuration configuration;
+    private Iec104Time time;
+    /** Test sequence counter of C_TS_TA_1, incremented per test command. */
+    private int testSequenceCounter;
 
     private Channel channel;
     private Iec104LinkLayer linkLayer;
@@ -176,7 +250,7 @@ public class Iec608705104Protocol extends Plc4xProtocolBase<APDU>
      */
     private final CompletableFuture<Void> initialInterrogation = new CompletableFuture<>();
 
-    private final Map<CommandKey, Deque<CompletableFuture<PlcResponseCode>>> pendingWrites = new HashMap<>();
+    private final Map<CommandKey, Deque<PendingCommand>> pendingCommands = new HashMap<>();
     private final Map<ObjectKey, Deque<CompletableFuture<PlcResponseItem<PlcValue>>>> pendingReads = new HashMap<>();
 
     private final Map<DefaultPlcConsumerRegistration, Consumer<PlcSubscriptionEvent>> consumers = new ConcurrentHashMap<>();
@@ -185,6 +259,7 @@ public class Iec608705104Protocol extends Plc4xProtocolBase<APDU>
     public void setConfiguration(Iec608705014Configuration configuration) {
         configuration.validate();
         this.configuration = configuration;
+        this.time = new Iec104Time(configuration.getTimeZone(), Clock.systemUTC());
     }
 
     @Override
@@ -280,8 +355,10 @@ public class Iec608705104Protocol extends Plc4xProtocolBase<APDU>
             linkLayer.stop();
         }
         initialInterrogation.complete(null);
-        pendingWrites.values().forEach(queue -> queue.forEach(f -> f.complete(PlcResponseCode.REMOTE_ERROR)));
-        pendingWrites.clear();
+        List<PendingCommand> commands = new ArrayList<>();
+        pendingCommands.values().forEach(commands::addAll);
+        commands.forEach(command -> command.finish(PlcResponseCode.REMOTE_ERROR));
+        pendingCommands.clear();
         pendingReads.values().forEach(queue -> queue.forEach(f -> f.complete(item(PlcResponseCode.REMOTE_ERROR, null))));
         pendingReads.clear();
         LOGGER.debug("IEC 104 connection closed");
@@ -315,6 +392,7 @@ public class Iec608705104Protocol extends Plc4xProtocolBase<APDU>
         switch (type) {
             case INTERROGATION_COMMAND:
                 onInterrogationAnswer(asdu);
+                onCommandAnswer(asdu);
                 return;
             case END_OF_INITIALISATION:
                 onEndOfInitialisation(asdu);
@@ -330,8 +408,17 @@ public class Iec608705104Protocol extends Plc4xProtocolBase<APDU>
         int typeValue = type.getValue();
         if (typeValue >= 1 && typeValue <= LAST_MONITORING_TYPE) {
             onMonitoringData(asdu);
-        } else if (typeValue >= FIRST_COMMAND_TYPE && typeValue <= LAST_COMMAND_TYPE) {
+        } else if ((typeValue >= FIRST_COMMAND_TYPE && typeValue <= LAST_COMMAND_TYPE)
+            || (typeValue >= FIRST_SYSTEM_TYPE && typeValue <= LAST_SYSTEM_TYPE)) {
             onCommandAnswer(asdu);
+        } else if (typeValue >= FIRST_PARAMETER_TYPE && typeValue <= LAST_PARAMETER_TYPE) {
+            // Parameters come back as the answer to a P_ME/P_AC command, or as data when the
+            // station reports them (read command, interrogation).
+            if (isAnswerToCommand(asdu.getCauseOfTransmission())) {
+                onCommandAnswer(asdu);
+            } else {
+                onMonitoringData(asdu);
+            }
         } else {
             LOGGER.debug("Ignoring ASDU of type {} with cause {}", type, asdu.getCauseOfTransmission());
         }
@@ -368,28 +455,77 @@ public class Iec608705104Protocol extends Plc4xProtocolBase<APDU>
     }
 
     /**
-     * The station's answer to one of our commands (write).
+     * The station's answer to one of our commands (write): ACT_CON / DEACT_CON (positive or
+     * negative), ACT_TERM, or a rejection with cause 44..47.
      */
     private void onCommandAnswer(ASDU asdu) {
         CauseOfTransmission cause = asdu.getCauseOfTransmission();
-        if (cause == CauseOfTransmission.TERMINATION_ACTIVATION_ACTTERM) {
-            // Sent by some stations after the command has been executed. The write was
-            // already answered with the ACT_CON.
-            return;
-        }
-        PlcResponseCode code = responseCodeOf(asdu);
-        if (code == null) {
+        if (!isAnswerToCommand(cause)) {
             LOGGER.debug("Ignoring command ASDU {} with cause {}", asdu.getTypeIdentification(), cause);
             return;
         }
         for (InformationObject object : asdu.getInformationObjects()) {
             CommandKey key = new CommandKey(asdu.getTypeIdentification(), asdu.getAsduAddressField(), object.getAddress());
-            CompletableFuture<PlcResponseCode> pending = pollPending(pendingWrites, key);
+            boolean termination = cause == CauseOfTransmission.TERMINATION_ACTIVATION_ACTTERM;
+            PendingCommand pending = findPending(key, termination);
+            if (pending == null && asdu.getAsduAddressField() != BROADCAST_ADDRESS) {
+                pending = findPending(new CommandKey(key.type(), BROADCAST_ADDRESS, key.objectAddress()), termination);
+            }
             if (pending == null) {
                 LOGGER.debug("Unexpected command answer {} for {}", cause, key);
-            } else {
-                pending.complete(code);
+                continue;
             }
+            if (termination) {
+                pending.finish(PlcResponseCode.OK);
+                continue;
+            }
+            PlcResponseCode code = responseCodeOf(asdu);
+            if (code == PlcResponseCode.OK && pending.awaitTermination) {
+                pending.confirmed = true;
+                pending.armTimeout(configuration.getTerminationTimeoutMillis(), "ACT_TERM");
+            } else {
+                if (code != PlcResponseCode.OK) {
+                    LOGGER.debug("Station refused the {}: cause {}, negative {}", pending.what, cause, asdu.getNegative());
+                }
+                pending.finish(code);
+            }
+        }
+    }
+
+    /**
+     * @param key         the command.
+     * @param termination {@code true} to find the oldest command waiting for its ACT_TERM,
+     *                    {@code false} for the oldest one waiting for its ACT_CON.
+     * @return the command, or {@code null}.
+     */
+    private PendingCommand findPending(CommandKey key, boolean termination) {
+        Deque<PendingCommand> queue = pendingCommands.get(key);
+        if (queue == null) {
+            return null;
+        }
+        for (PendingCommand pending : queue) {
+            if (pending.confirmed == termination) {
+                return pending;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @return {@code true} for the causes with which a station answers a command.
+     */
+    private static boolean isAnswerToCommand(CauseOfTransmission cause) {
+        switch (cause) {
+            case CONFIRMATION_ACTIVATION_ACTCON:
+            case CONFIRMATION_DEACTIVATION_DEACTCON:
+            case TERMINATION_ACTIVATION_ACTTERM:
+            case TYPE_IDENTIFICATION_UNKNOWN_UKNOWN_TYPE:
+            case CAUSE_UNKNOWN_UKNOWN_CAUSE:
+            case ASDU_ADDRESS_UNKNOWN_UNKNOWN_ASDU_ADDRESS:
+            case INFORMATION_OBJECT_ADDRESS_UNKNOWN_UNKNOWN_OBJECT_ADDRESS:
+                return true;
+            default:
+                return false;
         }
     }
 
@@ -444,6 +580,7 @@ public class Iec608705104Protocol extends Plc4xProtocolBase<APDU>
     private static PlcResponseCode responseCodeOf(ASDU asdu) {
         switch (asdu.getCauseOfTransmission()) {
             case CONFIRMATION_ACTIVATION_ACTCON:
+            case CONFIRMATION_DEACTIVATION_DEACTCON:
             case INTERROGATION_OR_INTERROGATED_REQ:
                 return asdu.getNegative() ? PlcResponseCode.REMOTE_ERROR : PlcResponseCode.OK;
             case TYPE_IDENTIFICATION_UNKNOWN_UKNOWN_TYPE:
@@ -513,14 +650,17 @@ public class Iec608705104Protocol extends Plc4xProtocolBase<APDU>
     // ---------------------------------------------------------------------------------------
 
     /**
-     * Writes each value with a command (direct execute) and waits for the station's
-     * activation confirmation. Which command is used is decided by
-     * {@link Iec104Commands#resolveDataType}.
+     * Writes each value with a command and waits for the station's answer. Which command is
+     * used is decided by {@link Iec104Commands#resolveDataType}; how it is sent (direct or
+     * select-before-operate, wait for ACT_TERM or not) by the tag options and the
+     * connection configuration, see {@link #executeCommand}. The tags of one request are
+     * sent at the same time, not one after the other.
      *
-     * <p>Response codes: OK on positive ACT_CON, REMOTE_ERROR on negative ACT_CON or no
-     * answer within {@code request-timeout}, NOT_FOUND / INVALID_DATATYPE when the station
-     * answers with unknown address / unknown type, INVALID_ADDRESS for wildcard addresses,
-     * INVALID_DATA for values the command cannot carry.
+     * <p>Response codes: OK when the station confirmed (ACT_CON, or ACT_TERM with
+     * {@code wait-for-termination}); REMOTE_ERROR on negative confirmation, no answer in time
+     * or a lost connection; NOT_FOUND / INVALID_DATATYPE when the station answers with
+     * unknown address / unknown type; INVALID_ADDRESS for wildcard addresses; INVALID_DATA
+     * for values the command cannot carry (nothing is sent then).
      */
     @Override
     public CompletableFuture<PlcWriteResponse> write(PlcWriteRequest writeRequest) {
@@ -533,16 +673,18 @@ public class Iec608705104Protocol extends Plc4xProtocolBase<APDU>
             }
             Iec608705104Tag tag = (Iec608705104Tag) plcTag;
             PlcValue value = writeRequest.getPlcValue(tagName);
-            ASDU command;
+            Iec608705104DataType dataType = Iec104Commands.resolveDataType(tag, value);
             try {
-                Iec608705104DataType dataType = Iec104Commands.resolveDataType(tag, value);
-                command = Iec104Commands.createWrite(tag, dataType, value, configuration.getOriginatorAddress());
+                // Built once only to reject values the command cannot carry before anything
+                // is sent; the ASDUs actually sent are built when they are sent (time tags).
+                Iec104Commands.createWrite(tag, dataType, value,
+                    new Iec104Commands.Context(configuration.getOriginatorAddress(), false, time, 0));
             } catch (RuntimeException e) {
                 LOGGER.debug("Cannot write {} to {}: {}", value, tag.getAddressString(), e.getMessage());
                 codes.put(tagName, CompletableFuture.completedFuture(PlcResponseCode.INVALID_DATA));
                 continue;
             }
-            codes.put(tagName, sendCommand(tag, command));
+            codes.put(tagName, executeCommand(tag, dataType, value));
         }
         return CompletableFuture.allOf(codes.values().toArray(new CompletableFuture[0]))
             .thenApply(ignored -> {
@@ -552,18 +694,105 @@ public class Iec608705104Protocol extends Plc4xProtocolBase<APDU>
             });
     }
 
-    private CompletableFuture<PlcResponseCode> sendCommand(Iec608705104Tag tag, ASDU command) {
+    /**
+     * Sends one written value: one command, or for a step command one per step, each
+     * after the previous one has been confirmed. A failed step stops the rest.
+     */
+    private CompletableFuture<PlcResponseCode> executeCommand(Iec608705104Tag tag, Iec608705104DataType dataType,
+                                                              PlcValue value) {
+        boolean selectBeforeOperate = Iec104Commands.supportsSelect(dataType)
+            && tag.getSelectBeforeOperate().orElse(configuration.isSelectBeforeOperate());
+        int repetitions = dataType == Iec608705104DataType.STEP ? Math.abs(Iec104Commands.steps(value)) : 1;
+        AtomicInteger done = new AtomicInteger();
+        CompletableFuture<PlcResponseCode> chain = CompletableFuture.completedFuture(PlcResponseCode.OK);
+        for (int i = 0; i < repetitions; i++) {
+            chain = chain.thenCompose(code -> {
+                if (code != PlcResponseCode.OK) {
+                    return CompletableFuture.completedFuture(code);
+                }
+                return executeOnce(tag, dataType, value, selectBeforeOperate)
+                    .thenApply(result -> {
+                        if (result == PlcResponseCode.OK) {
+                            done.incrementAndGet();
+                        }
+                        return result;
+                    });
+            });
+        }
+        if (repetitions > 1) {
+            chain = chain.thenApply(code -> {
+                if (code != PlcResponseCode.OK) {
+                    LOGGER.warn("Step command to {}: {} of {} steps executed, then {}",
+                        tag.getAddressString(), done.get(), repetitions, code);
+                }
+                return code;
+            });
+        }
+        return chain;
+    }
+
+    /**
+     * One command, as select-before-operate (select, then execute) or direct execute.
+     */
+    private CompletableFuture<PlcResponseCode> executeOnce(Iec608705104Tag tag, Iec608705104DataType dataType,
+                                                           PlcValue value, boolean selectBeforeOperate) {
+        boolean awaitTermination = configuration.isWaitForTermination() && isTerminated(dataType, tag);
+        if (!selectBeforeOperate) {
+            return sendCommand(tag, dataType, value, false, awaitTermination);
+        }
+        return sendCommand(tag, dataType, value, true, false)
+            .thenCompose(code -> code == PlcResponseCode.OK
+                ? sendCommand(tag, dataType, value, false, awaitTermination)
+                : CompletableFuture.completedFuture(code));
+    }
+
+    /**
+     * @return {@code true} if the station finishes this command with ACT_TERM: process
+     * commands (single, double, step, set point, bitstring) and interrogations. Clock
+     * synchronization, test, reset and parameters are only confirmed.
+     */
+    private static boolean isTerminated(Iec608705104DataType dataType, Iec608705104Tag tag) {
+        int type = dataType.getCommandType(tag.isTimeTagged()).getValue();
+        return (type >= FIRST_COMMAND_TYPE && type <= LAST_TERMINATED_PROCESS_COMMAND)
+            || dataType == Iec608705104DataType.INTERROGATION
+            || dataType == Iec608705104DataType.COUNTER_INTERROGATION;
+    }
+
+    /**
+     * Builds and sends one command ASDU and registers it as pending.
+     *
+     * @param select           {@code true} for the select of a select-before-operate.
+     * @param awaitTermination complete only on ACT_TERM.
+     */
+    private CompletableFuture<PlcResponseCode> sendCommand(Iec608705104Tag tag, Iec608705104DataType dataType,
+                                                           PlcValue value, boolean select, boolean awaitTermination) {
         CompletableFuture<PlcResponseCode> result = new CompletableFuture<>();
         runOnEventLoop(() -> {
             if (!canSend()) {
                 result.complete(PlcResponseCode.REMOTE_ERROR);
                 return;
             }
+            ASDU command;
+            try {
+                command = Iec104Commands.createWrite(tag, dataType, value, commandContext(select));
+            } catch (RuntimeException e) {
+                LOGGER.debug("Cannot write {} to {}: {}", value, tag.getAddressString(), e.getMessage());
+                result.complete(PlcResponseCode.INVALID_DATA);
+                return;
+            }
             CommandKey key = new CommandKey(command.getTypeIdentification(), tag.getAsduAddress(), tag.getObjectAddress());
-            addPending(pendingWrites, key, result, PlcResponseCode.REMOTE_ERROR, "write to " + tag.getAddressString());
+            PendingCommand pending = new PendingCommand(key, awaitTermination,
+                (select ? "select of " : "command to ") + tag.getAddressString());
+            pendingCommands.computeIfAbsent(key, k -> new ArrayDeque<>()).addLast(pending);
+            pending.armTimeout(configuration.getRequestTimeout(), "ACT_CON");
+            pending.result.whenComplete((code, error) -> result.complete(code));
             linkLayer.sendAsdu(command, System.nanoTime());
         });
         return result;
+    }
+
+    private Iec104Commands.Context commandContext(boolean select) {
+        return new Iec104Commands.Context(configuration.getOriginatorAddress(), select, time, testSequenceCounter++);
     }
 
     // ---------------------------------------------------------------------------------------
@@ -719,22 +948,6 @@ public class Iec608705104Protocol extends Plc4xProtocolBase<APDU>
         }, configuration.getRequestTimeout(), TimeUnit.MILLISECONDS);
     }
 
-    /**
-     * @return the oldest request still waiting for this key, removed from the map, or
-     * {@code null}.
-     */
-    private static <K, V> CompletableFuture<V> pollPending(Map<K, Deque<CompletableFuture<V>>> pending, K key) {
-        Deque<CompletableFuture<V>> queue = pending.get(key);
-        if (queue == null) {
-            return null;
-        }
-        CompletableFuture<V> first = queue.pollFirst();
-        if (queue.isEmpty()) {
-            pending.remove(key);
-        }
-        return first;
-    }
-
     private static <V> void completeAll(Deque<CompletableFuture<V>> futures, V value) {
         if (futures != null) {
             futures.forEach(future -> future.complete(value));
@@ -759,42 +972,21 @@ public class Iec608705104Protocol extends Plc4xProtocolBase<APDU>
     }
 
     /**
-     * @return the time tag of an information object, or now if it has none or an invalid one.
+     * @return the time tag of an information object, or now if it has none or an invalid
+     * one. Interpreted in the {@code time-zone} of the connection, see {@link Iec104Time}.
      */
-    static Instant timestampOf(InformationObject object) {
+    Instant timestampOf(InformationObject object) {
         try {
             if (object instanceof InformationObjectWithTreeByteTime) {
-                return convertCp24Time2a(((InformationObjectWithTreeByteTime) object).getCp24Time2a());
+                return time.fromCp24(((InformationObjectWithTreeByteTime) object).getCp24Time2a());
             }
             if (object instanceof InformationObjectWithSevenByteTime) {
-                return convertCp56Time2a(((InformationObjectWithSevenByteTime) object).getCp56Time2a());
+                return time.fromCp56(((InformationObjectWithSevenByteTime) object).getCp56Time2a());
             }
         } catch (RuntimeException e) {
             LOGGER.debug("Invalid time tag in information object {}: {}", object.getAddress(), e.getMessage());
         }
-        return Instant.now();
-    }
-
-    /**
-     * CP24Time2a only carries minutes and milliseconds; the rest is taken from the local
-     * clock (same as upstream PLC4X).
-     */
-    static Instant convertCp24Time2a(ThreeOctetBinaryTime time) {
-        LocalDateTime now = LocalDateTime.now();
-        return LocalDateTime.of(now.getYear(), now.getMonthValue(), now.getDayOfMonth(), now.getHour(),
-                time.getMinutes(), time.getMilliseconds() / 1000, (time.getMilliseconds() % 1000) * 1_000_000)
-            .atZone(ZoneId.systemDefault()).toInstant();
-    }
-
-    /**
-     * CP56Time2a. Interpreted as UTC, like upstream PLC4X; the summer time bit is ignored
-     * for that reason. Stations configured for local time will appear shifted by the UTC
-     * offset, see README.md.
-     */
-    static Instant convertCp56Time2a(SevenOctetBinaryTime time) {
-        return LocalDateTime.of(2000 + time.getYear(), time.getMonth(), time.getDay(), time.getHour(),
-                time.getMinutes(), time.getMilliseconds() / 1000, (time.getMilliseconds() % 1000) * 1_000_000)
-            .toInstant(ZoneOffset.UTC);
+        return time.now();
     }
 
     /**

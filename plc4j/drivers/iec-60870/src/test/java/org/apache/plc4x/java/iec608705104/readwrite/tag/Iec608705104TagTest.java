@@ -74,7 +74,7 @@ class Iec608705104TagTest {
     void typedTagReportsValueTypeAndCanonicalAddress() {
         Iec608705104Tag tag = Iec608705104Tag.of("1/310:c_se_nb_1");
         assertEquals(PlcValueType.INT, tag.getPlcValueType());
-        assertEquals("1/310:SCALED", tag.getAddressString());
+        assertEquals("1/310:C_SE_NB_1", tag.getAddressString(), "canonical form uses the IEC mnemonic");
     }
 
     @Test
@@ -107,10 +107,62 @@ class Iec608705104TagTest {
     @ParameterizedTest
     @ValueSource(strings = {
         "", "*", "1", "1/", "/1", "1/2/3", "1/2.3.4", "65536/1", "1/16777216", "1/-1",
-        "1/100:", "1/100:DOUBLE", "1 /100", "a/b", "000001/1", "1/100:FLOAT:BOOL"
+        "1/100:", "1/100:TRIPLE", "1 /100", "a/b", "000001/1", "1/100:FLOAT:BOOL",
+        // options: unknown, not for this type, out of range, missing or superfluous value
+        "1/100:FLOAT,fast", "1/100:FLOAT,qu=1", "1/100:BITSTRING,sbo", "1/100:BOOL,qu=32",
+        "1/100:FLOAT,ql=128", "1/100:BOOL,qu", "1/100:BOOL,sbo=1", "1/100:P_ME_NC_1,time",
+        "1/100:C_CS_NA_1,time", "1/100,sbo", "1/100:FLOAT,", "1/100:P_ME_NC_1,kpa=huge"
     })
     void rejectsInvalidAddresses(String address) {
         assertThrows(PlcInvalidTagException.class, () -> Iec608705104Tag.of(address));
+    }
+
+    @Test
+    void parsesAllTypesByNameAndMnemonic() {
+        for (Iec608705104DataType type : Iec608705104DataType.values()) {
+            assertEquals(type, Iec608705104Tag.of("1/1:" + type.name()).getDataType().orElseThrow());
+            Iec608705104Tag byMnemonic = Iec608705104Tag.of("1/1:" + type.getMnemonic());
+            assertEquals(type, byMnemonic.getDataType().orElseThrow());
+            assertFalse(byMnemonic.isTimeTagged());
+            if (type.hasTimeTaggedVariant()) {
+                Iec608705104Tag timeTagged = Iec608705104Tag.of("1/1:" + type.getMnemonic(true).toLowerCase());
+                assertEquals(type, timeTagged.getDataType().orElseThrow());
+                assertTrue(timeTagged.isTimeTagged());
+                assertEquals(timeTagged, Iec608705104Tag.of("1/1:" + type.name() + ",time"));
+            }
+        }
+    }
+
+    @Test
+    void parsesOptions() {
+        Iec608705104Tag tag = Iec608705104Tag.of("1/500:DOUBLE,SBO,qu=short");
+        assertEquals(Iec608705104DataType.DOUBLE, tag.getDataType().orElseThrow());
+        assertEquals(true, tag.getSelectBeforeOperate().orElseThrow());
+        assertEquals(1, tag.getQualifierOfCommand().orElseThrow());
+        assertEquals("1/500:C_DC_NA_1,sbo,qu=1", tag.getAddressString());
+
+        Iec608705104Tag direct = Iec608705104Tag.of("1/300:C_SE_TC_1,direct,ql=7");
+        assertEquals(false, direct.getSelectBeforeOperate().orElseThrow());
+        assertEquals(7, direct.getQualifierOfSetPoint().orElseThrow());
+        assertTrue(direct.isTimeTagged());
+        assertEquals("1/300:C_SE_TC_1,direct,ql=7", direct.getAddressString());
+
+        assertEquals(4, Iec608705104Tag.of("1/800:P_ME_NC_1,kpa=high").getKindOfParameter().orElseThrow());
+        assertEquals(2, Iec608705104Tag.of("1/0:C_CI_NA_1,frz=freeze_reset").getFreeze().orElseThrow());
+        assertTrue(Iec608705104Tag.of("1/800:P_AC_NA_1,deact").isDeactivate());
+
+        Iec608705104Tag plain = Iec608705104Tag.of("1/300:FLOAT");
+        assertTrue(plain.getSelectBeforeOperate().isEmpty(), "connection default applies");
+        assertTrue(plain.getQualifierOfSetPoint().isEmpty());
+    }
+
+    @Test
+    void valueTypesForWriting() {
+        assertEquals(PlcValueType.BOOL, Iec608705104Tag.of("1/1:BOOL").getPlcValueType());
+        assertNull(Iec608705104Tag.of("1/1:DOUBLE").getPlcValueType(), "boolean or string");
+        assertNull(Iec608705104Tag.of("1/1:STEP").getPlcValueType(), "any whole number");
+        assertNull(Iec608705104Tag.of("1/1:C_CS_NA_1").getPlcValueType(), "date/time or anything");
+        assertEquals(PlcValueType.REAL, Iec608705104Tag.of("1/1:P_ME_NC_1").getPlcValueType());
     }
 
     @Test

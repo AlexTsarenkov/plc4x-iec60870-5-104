@@ -18,6 +18,7 @@
  */
 package org.apache.plc4x.java.iec608705104.readwrite.configuration;
 
+import org.apache.plc4x.java.iec608705104.readwrite.protocol.Iec104Time;
 import org.apache.plc4x.java.spi.configuration.PlcConnectionConfiguration;
 import org.apache.plc4x.java.spi.configuration.annotations.ConfigurationParameter;
 import org.apache.plc4x.java.spi.configuration.annotations.Description;
@@ -25,6 +26,7 @@ import org.apache.plc4x.java.spi.configuration.annotations.defaults.BooleanDefau
 import org.apache.plc4x.java.spi.configuration.annotations.defaults.IntDefaultValue;
 import org.apache.plc4x.java.spi.configuration.annotations.defaults.StringDefaultValue;
 
+import java.time.ZoneId;
 import java.util.Locale;
 
 /**
@@ -110,6 +112,26 @@ public class Iec608705014Configuration implements PlcConnectionConfiguration {
     @Description("How read requests are answered: 'cache' (values already received) or 'command' (C_RD_NA_1 per tag).")
     protected String readMode;
 
+    @ConfigurationParameter("select-before-operate")
+    @BooleanDefaultValue(false)
+    @Description("Send commands as select-before-operate (select, then execute) unless the tag says 'direct'.")
+    protected boolean selectBeforeOperate;
+
+    @ConfigurationParameter("wait-for-termination")
+    @BooleanDefaultValue(false)
+    @Description("A command is only complete when the station sends ACT_TERM, not already with ACT_CON.")
+    protected boolean waitForTermination;
+
+    @ConfigurationParameter("termination-timeout-ms")
+    @IntDefaultValue(30000)
+    @Description("With wait-for-termination: how long to wait for ACT_TERM after ACT_CON (ms).")
+    protected int terminationTimeoutMillis;
+
+    @ConfigurationParameter("time-zone")
+    @StringDefaultValue("UTC")
+    @Description("Time zone of the station's time tags (CP56Time2a/CP24Time2a): 'UTC', 'local' or a zone id like 'Europe/Moscow'.")
+    protected String timeZone;
+
     @ConfigurationParameter("originator-address")
     @IntDefaultValue(0)
     @Description("Originator address put into every ASDU this client sends (0..255).")
@@ -143,6 +165,8 @@ public class Iec608705014Configuration implements PlcConnectionConfiguration {
             throw new IllegalArgumentException("originator-address must be in 0..255, was " + originatorAddress);
         }
         getReadMode();
+        requirePositive("termination-timeout-ms", terminationTimeoutMillis);
+        getTimeZone();
     }
 
     private static void requirePositive(String name, int value) {
@@ -240,6 +264,42 @@ public class Iec608705014Configuration implements PlcConnectionConfiguration {
         this.readMode = readMode;
     }
 
+    public boolean isSelectBeforeOperate() {
+        return selectBeforeOperate;
+    }
+
+    public void setSelectBeforeOperate(boolean selectBeforeOperate) {
+        this.selectBeforeOperate = selectBeforeOperate;
+    }
+
+    public boolean isWaitForTermination() {
+        return waitForTermination;
+    }
+
+    public void setWaitForTermination(boolean waitForTermination) {
+        this.waitForTermination = waitForTermination;
+    }
+
+    public int getTerminationTimeoutMillis() {
+        return terminationTimeoutMillis;
+    }
+
+    public void setTerminationTimeoutMillis(int terminationTimeoutMillis) {
+        this.terminationTimeoutMillis = terminationTimeoutMillis;
+    }
+
+    /**
+     * @return the parsed {@code time-zone} option.
+     * @throws IllegalArgumentException for an unknown zone.
+     */
+    public ZoneId getTimeZone() {
+        return Iec104Time.parseZone(timeZone);
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
+    }
+
     public int getOriginatorAddress() {
         return originatorAddress;
     }
@@ -258,6 +318,10 @@ public class Iec608705014Configuration implements PlcConnectionConfiguration {
             ", interrogationAsduAddress=" + interrogationAsduAddress +
             ", interrogationTimeout=" + interrogationTimeoutMillis +
             ", readMode=" + readMode +
+            ", selectBeforeOperate=" + selectBeforeOperate +
+            ", waitForTermination=" + waitForTermination +
+            ", terminationTimeout=" + terminationTimeoutMillis +
+            ", timeZone=" + timeZone +
             ", originatorAddress=" + originatorAddress +
             '}';
     }
