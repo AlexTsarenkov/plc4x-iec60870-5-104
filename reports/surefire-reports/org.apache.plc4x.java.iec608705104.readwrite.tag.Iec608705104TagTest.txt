@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: org.apache.plc4x.java.iec608705104.readwrite.tag.Iec608705104TagTest
+-------------------------------------------------------------------------------
+Tests run: 40, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.381 s -- in org.apache.plc4x.java.iec608705104.readwrite.tag.Iec608705104TagTest

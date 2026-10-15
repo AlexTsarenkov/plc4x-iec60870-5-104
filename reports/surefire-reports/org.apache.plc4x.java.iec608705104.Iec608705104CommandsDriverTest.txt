@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest
+-------------------------------------------------------------------------------
+Tests run: 24, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 51.24 s -- in org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest
