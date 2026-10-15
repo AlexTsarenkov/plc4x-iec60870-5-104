@@ -18,31 +18,8 @@
  */
 package org.apache.plc4x.java.iec608705104;
 
-import org.apache.plc4x.java.iec608705104.readwrite.APDU;
-import org.apache.plc4x.java.iec608705104.readwrite.APDUIFormat;
-import org.apache.plc4x.java.iec608705104.readwrite.APDUSFormat;
-import org.apache.plc4x.java.iec608705104.readwrite.APDUUFormatStartDataTransferActivation;
-import org.apache.plc4x.java.iec608705104.readwrite.APDUUFormatStartDataTransferConfirmation;
-import org.apache.plc4x.java.iec608705104.readwrite.APDUUFormatTestFrameActivation;
-import org.apache.plc4x.java.iec608705104.readwrite.APDUUFormatTestFrameConfirmation;
-import org.apache.plc4x.java.iec608705104.readwrite.ASDU;
-import org.apache.plc4x.java.iec608705104.readwrite.CauseOfInitialization;
-import org.apache.plc4x.java.iec608705104.readwrite.CauseOfTransmission;
-import org.apache.plc4x.java.iec608705104.readwrite.InformationObject;
-import org.apache.plc4x.java.iec608705104.readwrite.InformationObjectWithoutTime_END_OF_INITIALISATION;
-import org.apache.plc4x.java.iec608705104.readwrite.InformationObjectWithoutTime_MEASURED_VALUE_NORMALISED_VALUE;
-import org.apache.plc4x.java.iec608705104.readwrite.InformationObjectWithoutTime_MEASURED_VALUE_SCALED_VALUE;
-import org.apache.plc4x.java.iec608705104.readwrite.InformationObjectWithoutTime_MEASURED_VALUE_SHORT_FLOATING_POINT_NUMBER;
-import org.apache.plc4x.java.iec608705104.readwrite.InformationObjectWithoutTime_SET_POINT_COMMAND_NORMALISED_VALUE;
-import org.apache.plc4x.java.iec608705104.readwrite.InformationObjectWithoutTime_SET_POINT_COMMAND_SCALED_VALUE;
-import org.apache.plc4x.java.iec608705104.readwrite.InformationObjectWithoutTime_SET_POINT_COMMAND_SHORT_FLOATING_POINT_NUMBER;
-import org.apache.plc4x.java.iec608705104.readwrite.InformationObjectWithoutTime_SINGLE_COMMAND;
-import org.apache.plc4x.java.iec608705104.readwrite.InformationObjectWithoutTime_SINGLE_POINT_INFORMATION;
-import org.apache.plc4x.java.iec608705104.readwrite.NormalizedValue;
-import org.apache.plc4x.java.iec608705104.readwrite.QualityDescriptor;
-import org.apache.plc4x.java.iec608705104.readwrite.ScaledValue;
-import org.apache.plc4x.java.iec608705104.readwrite.SinglePointInformation;
-import org.apache.plc4x.java.iec608705104.readwrite.TypeIdentification;
+import org.apache.plc4x.java.iec608705104.readwrite.*;
+import org.apache.plc4x.java.iec608705104.readwrite.protocol.Iec104Time;
 import org.apache.plc4x.java.spi.generation.ByteOrder;
 import org.apache.plc4x.java.spi.generation.ReadBufferByteBased;
 import org.apache.plc4x.java.spi.generation.WriteBufferByteBased;
@@ -55,12 +32,19 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
 /**
@@ -68,24 +52,46 @@ import java.util.function.Predicate;
  *
  * <p>Written against the same generated message classes as the driver, so on its own it
  * cannot catch mistakes in the mspec; that is what the interop test against the c104
- * server is for. What it can do that a real station cannot: misbehave on purpose (not
- * acknowledge, not answer, reject) and record every frame the driver sent.
+ * server and the byte-level tests are for. What it can do that a real station cannot:
+ * misbehave on purpose (not acknowledge, not answer, reject, delay) and record every frame
+ * and command value the driver sent.
  *
  * <p>One client connection at a time, one thread reading it. All values live in common
- * address {@link #ASDU_ADDRESS}.
+ * address {@link #ASDU_ADDRESS}; commands to any other address than that and the broadcast
+ * address are refused with cause 46 (unknown common address).
  */
 public class Iec104TestStation implements AutoCloseable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Iec104TestStation.class);
 
     public static final int ASDU_ADDRESS = 1;
+    public static final int BROADCAST = 0xFFFF;
 
-    /** Kinds of monitoring points the station can hold. */
-    public enum PointType { FLOAT, SCALED, NORMALIZED, SINGLE }
+    /** Kinds of monitoring points the station can hold, with the type of their value. */
+    public enum PointType {
+        /** M_ME_NC_1, Number. */
+        FLOAT,
+        /** M_ME_NB_1, Number. */
+        SCALED,
+        /** M_ME_NA_1, Number (-1..1). */
+        NORMALIZED,
+        /** M_SP_NA_1, Boolean. */
+        SINGLE,
+        /** M_DP_NA_1, Integer double point code 0..3. */
+        DOUBLE,
+        /** M_ST_NA_1, Integer step position -64..63. */
+        STEP,
+        /** M_BO_NA_1, Long. */
+        BITSTRING,
+        /** M_IT_NA_1, Long; only sent on counter interrogation. */
+        COUNTER,
+        /** M_ME_TF_1, Number; sent with the time tag set by {@link #timeTag(Instant)}. */
+        FLOAT_WITH_TIME
+    }
 
     /** How the station reacts to a command for an IOA. */
     public enum CommandBehaviour {
-        /** Positive ACT_CON, update the mirrored monitoring point and send it with COT 11. */
+        /** Positive ACT_CON, update the mirrored monitoring point, send it with COT 11, ACT_TERM. */
         ACCEPT,
         /** Negative ACT_CON. */
         REJECT,
@@ -93,22 +99,73 @@ public class Iec104TestStation implements AutoCloseable {
         IGNORE
     }
 
-    private record Point(PointType type, Object value) {
+    /** Configuration of one command IOA. Mutable, set up by the tests before connecting. */
+    public static final class Command {
+        private CommandBehaviour behaviour;
+        private int mirrorIoa;
+        private boolean requireSelect;
+        private boolean sendTermination = true;
+        private long terminationDelayMillis;
+        private int acceptLimit = Integer.MAX_VALUE;
+
+        private Command(CommandBehaviour behaviour, int mirrorIoa) {
+            this.behaviour = behaviour;
+            this.mirrorIoa = mirrorIoa;
+        }
+
+        /** Executes are refused unless a select of the same IOA came first. */
+        public Command requireSelect() {
+            this.requireSelect = true;
+            return this;
+        }
+
+        /** No ACT_TERM after the ACT_CON. */
+        public Command withoutTermination() {
+            this.sendTermination = false;
+            return this;
+        }
+
+        /** ACT_TERM only after this delay, like a tap changer that takes its time. */
+        public Command terminationDelay(long millis) {
+            this.terminationDelayMillis = millis;
+            return this;
+        }
+
+        /** Accept only this many executes, refuse the ones after. */
+        public Command acceptOnly(int executes) {
+            this.acceptLimit = executes;
+            return this;
+        }
     }
 
-    private record Command(CommandBehaviour behaviour, int mirrorIoa) {
+    /** A command the station received, with the select bit and time tag decoded. */
+    public record ReceivedCommand(ASDU asdu, InformationObject object, boolean select, Instant timeTag) {
+    }
+
+    private record Point(PointType type, Object value) {
     }
 
     private final ServerSocket serverSocket;
     private final Thread acceptThread;
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(runnable -> {
+        Thread thread = new Thread(runnable, "iec104-test-station-scheduler");
+        thread.setDaemon(true);
+        return thread;
+    });
     private final Map<Integer, Point> points = new ConcurrentHashMap<>();
     private final Map<Integer, Command> commands = new ConcurrentHashMap<>();
+    private final Map<Integer, AtomicInteger> executes = new ConcurrentHashMap<>();
+    private final Map<Integer, Boolean> selected = new ConcurrentHashMap<>();
     private final List<APDU> received = new CopyOnWriteArrayList<>();
     private final List<ASDU> receivedAsdus = new CopyOnWriteArrayList<>();
+    private final List<ReceivedCommand> receivedCommands = new CopyOnWriteArrayList<>();
 
     private volatile boolean acknowledgeClientFrames = true;
     private volatile boolean answerInterrogation = true;
     private volatile boolean answerReadCommands = true;
+    private volatile boolean answerBroadcastWithOwnAddress = true;
+    private volatile Iec104Time time = new Iec104Time(ZoneOffset.UTC, Clock.systemUTC());
+    private volatile Instant timeTag = Instant.parse("2026-01-02T03:04:05.678Z");
 
     private volatile Socket client;
     private volatile OutputStream output;
@@ -145,6 +202,11 @@ public class Iec104TestStation implements AutoCloseable {
         return this;
     }
 
+    /** @return the configuration of a command IOA, to refine it. */
+    public Command commandAt(int ioa) {
+        return commands.get(ioa);
+    }
+
     public Iec104TestStation acknowledgeClientFrames(boolean acknowledge) {
         this.acknowledgeClientFrames = acknowledge;
         return this;
@@ -160,6 +222,24 @@ public class Iec104TestStation implements AutoCloseable {
         return this;
     }
 
+    /** Whether answers to broadcast commands carry the station's own address (default) or 65535. */
+    public Iec104TestStation answerBroadcastWithOwnAddress(boolean ownAddress) {
+        this.answerBroadcastWithOwnAddress = ownAddress;
+        return this;
+    }
+
+    /** The zone the station's time tags are in, for sending and for decoding commands. */
+    public Iec104TestStation timeZone(ZoneId zone) {
+        this.time = new Iec104Time(zone, Clock.systemUTC());
+        return this;
+    }
+
+    /** The time tag sent with {@link PointType#FLOAT_WITH_TIME} points. */
+    public Iec104TestStation timeTag(Instant instant) {
+        this.timeTag = instant;
+        return this;
+    }
+
     // -- inspection ------------------------------------------------------------------------
 
     /** @return every frame received from the client, in order. */
@@ -170,6 +250,22 @@ public class Iec104TestStation implements AutoCloseable {
     /** @return the ASDUs of all I-frames received from the client, in order. */
     public List<ASDU> getReceivedAsdus() {
         return new ArrayList<>(receivedAsdus);
+    }
+
+    /** @return all commands (control direction ASDUs) received, decoded, in order. */
+    public List<ReceivedCommand> getReceivedCommands() {
+        return new ArrayList<>(receivedCommands);
+    }
+
+    /** @return the received commands of one type, in order. */
+    public List<ReceivedCommand> getReceivedCommands(TypeIdentification type) {
+        List<ReceivedCommand> result = new ArrayList<>();
+        for (ReceivedCommand command : receivedCommands) {
+            if (command.asdu().getTypeIdentification() == type) {
+                result.add(command);
+            }
+        }
+        return result;
     }
 
     /** @return the current value of a monitoring point. */
@@ -294,16 +390,36 @@ public class Iec104TestStation implements AutoCloseable {
     private void onAsdu(ASDU request) throws IOException {
         TypeIdentification type = request.getTypeIdentification();
         InformationObject object = request.getInformationObjects().get(0);
+        int typeValue = type.getValue();
+        if (typeValue >= 45) {
+            receivedCommands.add(new ReceivedCommand(request, object, selectBitOf(object), timeTagOf(object)));
+        }
+        if (request.getAsduAddressField() != ASDU_ADDRESS && request.getAsduAddressField() != BROADCAST) {
+            sendAsdu(mirror(request, CauseOfTransmission.ASDU_ADDRESS_UNKNOWN_UNKNOWN_ASDU_ADDRESS, true));
+            return;
+        }
         switch (type) {
             case INTERROGATION_COMMAND: {
                 if (!answerInterrogation) {
                     return;
                 }
-                sendAsdu(mirror(request, CauseOfTransmission.CONFIRMATION_ACTIVATION_ACTCON, false));
+                sendAsdu(answer(request, CauseOfTransmission.CONFIRMATION_ACTIVATION_ACTCON, false));
                 for (Integer ioa : points.keySet()) {
-                    sendAsdu(monitoringAsdu(ioa, CauseOfTransmission.INTERROGATED_BY_GENERAL_INTERROGATION_INROGEN));
+                    if (points.get(ioa).type() != PointType.COUNTER) {
+                        sendAsdu(monitoringAsdu(ioa, CauseOfTransmission.INTERROGATED_BY_GENERAL_INTERROGATION_INROGEN));
+                    }
                 }
-                sendAsdu(mirror(request, CauseOfTransmission.TERMINATION_ACTIVATION_ACTTERM, false));
+                sendAsdu(answer(request, CauseOfTransmission.TERMINATION_ACTIVATION_ACTTERM, false));
+                return;
+            }
+            case COUNTER_INTERROGATION_COMMAND: {
+                sendAsdu(answer(request, CauseOfTransmission.CONFIRMATION_ACTIVATION_ACTCON, false));
+                for (Integer ioa : points.keySet()) {
+                    if (points.get(ioa).type() == PointType.COUNTER) {
+                        sendAsdu(monitoringAsdu(ioa, CauseOfTransmission.INTERROGATED_BY_COUNTER_GENERAL_INTERROGATION_REQCOGEN));
+                    }
+                }
+                sendAsdu(answer(request, CauseOfTransmission.TERMINATION_ACTIVATION_ACTTERM, false));
                 return;
             }
             case READ_COMMAND: {
@@ -317,45 +433,101 @@ public class Iec104TestStation implements AutoCloseable {
                 }
                 return;
             }
-            case SET_POINT_COMMAND_SHORT_FLOATING_POINT_NUMBER:
-            case SET_POINT_COMMAND_SCALED_VALUE:
-            case SET_POINT_COMMAND_NORMALISED_VALUE:
-            case SINGLE_COMMAND: {
+            case CLOCK_SYNCHRONISATION_COMMAND:
+            case TEST_COMMAND:
+            case TEST_COMMAND_WITH_TIME_TAG_CP56TIME2A:
+            case RESET_PROCESS_COMMAND:
+            case DELAY_ACQUISITION_COMMAND:
+                // Always accepted, only confirmed; the tests look at getReceivedCommands().
+                sendAsdu(mirror(request, CauseOfTransmission.CONFIRMATION_ACTIVATION_ACTCON, false));
+                return;
+            case PARAMETER_OF_MEASURED_VALUES_NORMALIZED_VALUE:
+            case PARAMETER_OF_MEASURED_VALUES_SCALED_VALUE:
+            case PARAMETER_OF_MEASURED_VALUES_SHORT_FLOATING_POINT_NUMBER:
+            case PARAMETER_ACTIVATION: {
                 Command command = commands.get(object.getAddress());
                 if (command == null) {
                     sendAsdu(mirror(request, CauseOfTransmission.INFORMATION_OBJECT_ADDRESS_UNKNOWN_UNKNOWN_OBJECT_ADDRESS, true));
-                    return;
+                } else if (command.behaviour != CommandBehaviour.IGNORE) {
+                    CauseOfTransmission confirmation = request.getCauseOfTransmission() == CauseOfTransmission.DEACTIVATION_DEACT
+                        ? CauseOfTransmission.CONFIRMATION_DEACTIVATION_DEACTCON
+                        : CauseOfTransmission.CONFIRMATION_ACTIVATION_ACTCON;
+                    sendAsdu(mirror(request, confirmation, command.behaviour == CommandBehaviour.REJECT));
                 }
-                switch (command.behaviour()) {
-                    case IGNORE:
-                        return;
-                    case REJECT:
-                        sendAsdu(mirror(request, CauseOfTransmission.CONFIRMATION_ACTIVATION_ACTCON, true));
-                        return;
-                    case ACCEPT:
-                    default:
-                        // Update first, so a test that got the ACT_CON sees the new value.
-                        Point target = points.get(command.mirrorIoa());
-                        if (target != null) {
-                            points.put(command.mirrorIoa(), new Point(target.type(), commandValue(object)));
-                        }
-                        sendAsdu(mirror(request, CauseOfTransmission.CONFIRMATION_ACTIVATION_ACTCON, false));
-                        if (target != null) {
-                            sendAsdu(monitoringAsdu(command.mirrorIoa(), CauseOfTransmission.FEEDBACK_CAUSED_BY_DISTANT_COMMAND_RETREM));
-                        }
-                        sendAsdu(mirror(request, CauseOfTransmission.TERMINATION_ACTIVATION_ACTTERM, false));
-                        return;
-                }
+                return;
             }
             default:
-                sendAsdu(mirror(request, CauseOfTransmission.TYPE_IDENTIFICATION_UNKNOWN_UKNOWN_TYPE, true));
+                break;
+        }
+        if (typeValue >= 45 && typeValue <= 64) {
+            onProcessCommand(request, object);
+        } else {
+            sendAsdu(mirror(request, CauseOfTransmission.TYPE_IDENTIFICATION_UNKNOWN_UKNOWN_TYPE, true));
         }
     }
 
-    /** The value carried by a command, in the representation the monitoring points use. */
-    private static Object commandValue(InformationObject object) {
+    private void onProcessCommand(ASDU request, InformationObject object) throws IOException {
+        Command command = commands.get(object.getAddress());
+        if (command == null) {
+            sendAsdu(mirror(request, CauseOfTransmission.INFORMATION_OBJECT_ADDRESS_UNKNOWN_UNKNOWN_OBJECT_ADDRESS, true));
+            return;
+        }
+        if (command.behaviour == CommandBehaviour.IGNORE) {
+            return;
+        }
+        if (command.behaviour == CommandBehaviour.REJECT) {
+            sendAsdu(mirror(request, CauseOfTransmission.CONFIRMATION_ACTIVATION_ACTCON, true));
+            return;
+        }
+        int ioa = object.getAddress();
+        if (selectBitOf(object)) {
+            // Select: only allowed where the station is configured for it.
+            if (command.requireSelect) {
+                selected.put(ioa, true);
+            }
+            sendAsdu(mirror(request, CauseOfTransmission.CONFIRMATION_ACTIVATION_ACTCON, !command.requireSelect));
+            return;
+        }
+        if (command.requireSelect && selected.remove(ioa) == null) {
+            sendAsdu(mirror(request, CauseOfTransmission.CONFIRMATION_ACTIVATION_ACTCON, true));
+            return;
+        }
+        if (executes.computeIfAbsent(ioa, k -> new AtomicInteger()).incrementAndGet() > command.acceptLimit) {
+            sendAsdu(mirror(request, CauseOfTransmission.CONFIRMATION_ACTIVATION_ACTCON, true));
+            return;
+        }
+        // Update first, so a test that got the ACT_CON sees the new value.
+        Point target = points.get(command.mirrorIoa);
+        if (target != null) {
+            points.put(command.mirrorIoa, new Point(target.type(), applyCommand(target, object)));
+        }
+        sendAsdu(mirror(request, CauseOfTransmission.CONFIRMATION_ACTIVATION_ACTCON, false));
+        if (target != null) {
+            sendAsdu(monitoringAsdu(command.mirrorIoa, CauseOfTransmission.FEEDBACK_CAUSED_BY_DISTANT_COMMAND_RETREM));
+        }
+        if (command.sendTermination) {
+            ASDU termination = mirror(request, CauseOfTransmission.TERMINATION_ACTIVATION_ACTTERM, false);
+            if (command.terminationDelayMillis > 0) {
+                scheduler.schedule(() -> {
+                    try {
+                        sendAsdu(termination);
+                    } catch (IOException e) {
+                        LOGGER.debug("Could not send delayed ACT_TERM: {}", e.getMessage());
+                    }
+                }, command.terminationDelayMillis, TimeUnit.MILLISECONDS);
+            } else {
+                sendAsdu(termination);
+            }
+        }
+    }
+
+    /** The new value of a monitoring point after a command. */
+    private static Object applyCommand(Point target, InformationObject object) {
         if (object instanceof InformationObjectWithoutTime_SET_POINT_COMMAND_SHORT_FLOATING_POINT_NUMBER) {
             return ((InformationObjectWithoutTime_SET_POINT_COMMAND_SHORT_FLOATING_POINT_NUMBER) object).getValue();
+        }
+        if (object instanceof InformationObjectWithSevenByteTime_SET_POINT_COMMAND_SHORT_FLOATING_POINT_NUMBER) {
+            return ((InformationObjectWithSevenByteTime_SET_POINT_COMMAND_SHORT_FLOATING_POINT_NUMBER) object).getValue();
         }
         if (object instanceof InformationObjectWithoutTime_SET_POINT_COMMAND_SCALED_VALUE) {
             return ((InformationObjectWithoutTime_SET_POINT_COMMAND_SCALED_VALUE) object).getSva().getValue();
@@ -366,7 +538,61 @@ public class Iec104TestStation implements AutoCloseable {
         if (object instanceof InformationObjectWithoutTime_SINGLE_COMMAND) {
             return ((InformationObjectWithoutTime_SINGLE_COMMAND) object).getSco().getCommandOn();
         }
-        throw new IllegalArgumentException("Not a supported command: " + object);
+        if (object instanceof InformationObjectWithSevenByteTime_SINGLE_COMMAND) {
+            return ((InformationObjectWithSevenByteTime_SINGLE_COMMAND) object).getSco().getCommandOn();
+        }
+        if (object instanceof InformationObjectWithoutTime_DOUBLE_COMMAND) {
+            return (int) ((InformationObjectWithoutTime_DOUBLE_COMMAND) object).getDco().getDcs();
+        }
+        if (object instanceof InformationObjectWithoutTime_REGULATING_STEP_COMMAND) {
+            int position = (Integer) target.value();
+            return ((InformationObjectWithoutTime_REGULATING_STEP_COMMAND) object).getRco().getRcs() == 2 ? position + 1 : position - 1;
+        }
+        if (object instanceof InformationObjectWithoutTime_BITSTRING_32_BIT_COMMAND) {
+            return ((InformationObjectWithoutTime_BITSTRING_32_BIT_COMMAND) object).getBsi().getBits();
+        }
+        return target.value();
+    }
+
+    private static boolean selectBitOf(InformationObject object) {
+        if (object instanceof InformationObjectWithoutTime_SINGLE_COMMAND) {
+            return ((InformationObjectWithoutTime_SINGLE_COMMAND) object).getSco().getQoc().getSelect();
+        }
+        if (object instanceof InformationObjectWithSevenByteTime_SINGLE_COMMAND) {
+            return ((InformationObjectWithSevenByteTime_SINGLE_COMMAND) object).getSco().getQoc().getSelect();
+        }
+        if (object instanceof InformationObjectWithoutTime_DOUBLE_COMMAND) {
+            return ((InformationObjectWithoutTime_DOUBLE_COMMAND) object).getDco().getQoc().getSelect();
+        }
+        if (object instanceof InformationObjectWithoutTime_REGULATING_STEP_COMMAND) {
+            return ((InformationObjectWithoutTime_REGULATING_STEP_COMMAND) object).getRco().getQoc().getSelect();
+        }
+        if (object instanceof InformationObjectWithoutTime_SET_POINT_COMMAND_SHORT_FLOATING_POINT_NUMBER) {
+            return ((InformationObjectWithoutTime_SET_POINT_COMMAND_SHORT_FLOATING_POINT_NUMBER) object).getQos().getSelect();
+        }
+        if (object instanceof InformationObjectWithSevenByteTime_SET_POINT_COMMAND_SHORT_FLOATING_POINT_NUMBER) {
+            return ((InformationObjectWithSevenByteTime_SET_POINT_COMMAND_SHORT_FLOATING_POINT_NUMBER) object).getQos().getSelect();
+        }
+        if (object instanceof InformationObjectWithoutTime_SET_POINT_COMMAND_SCALED_VALUE) {
+            return ((InformationObjectWithoutTime_SET_POINT_COMMAND_SCALED_VALUE) object).getQos().getSelect();
+        }
+        if (object instanceof InformationObjectWithoutTime_SET_POINT_COMMAND_NORMALISED_VALUE) {
+            return ((InformationObjectWithoutTime_SET_POINT_COMMAND_NORMALISED_VALUE) object).getQos().getSelect();
+        }
+        return false;
+    }
+
+    private Instant timeTagOf(InformationObject object) {
+        if (object instanceof InformationObjectWithSevenByteTime) {
+            return time.fromCp56(((InformationObjectWithSevenByteTime) object).getCp56Time2a());
+        }
+        if (object instanceof InformationObjectWithoutTime_CLOCK_SYNCHRONISATION_COMMAND) {
+            return time.fromCp56(((InformationObjectWithoutTime_CLOCK_SYNCHRONISATION_COMMAND) object).getCp56Time2a());
+        }
+        if (object instanceof InformationObjectWithoutTime_TEST_COMMAND_WITH_TIME_TAG) {
+            return time.fromCp56(((InformationObjectWithoutTime_TEST_COMMAND_WITH_TIME_TAG) object).getCp56Time2a());
+        }
+        return null;
     }
 
     private ASDU monitoringAsdu(int ioa, CauseOfTransmission cause) {
@@ -377,6 +603,10 @@ public class Iec104TestStation implements AutoCloseable {
                 return asdu(TypeIdentification.MEASURED_VALUE_SHORT_FLOATING_POINT_NUMBER, cause, false,
                     new InformationObjectWithoutTime_MEASURED_VALUE_SHORT_FLOATING_POINT_NUMBER(
                         ioa, ((Number) point.value()).floatValue(), good));
+            case FLOAT_WITH_TIME:
+                return asdu(TypeIdentification.MEASURED_VALUE_SHORT_FLOATING_POINT_NUMBER_WITH_TIME_TAG_CP56TIME2A, cause, false,
+                    new InformationObjectWithSevenByteTime_MEASURED_VALUE_SHORT_FLOATING_POINT_NUMBER(
+                        ioa, ((Number) point.value()).floatValue(), good, time.toCp56(timeTag)));
             case SCALED:
                 return asdu(TypeIdentification.MEASURED_VALUE_SCALED_VALUE, cause, false,
                     new InformationObjectWithoutTime_MEASURED_VALUE_SCALED_VALUE(
@@ -385,6 +615,22 @@ public class Iec104TestStation implements AutoCloseable {
                 int raw = ((short) Math.round(((Number) point.value()).doubleValue() * 32768)) & 0xFFFF;
                 return asdu(TypeIdentification.MEASURED_VALUE_NORMALISED_VALUE, cause, false,
                     new InformationObjectWithoutTime_MEASURED_VALUE_NORMALISED_VALUE(ioa, new NormalizedValue(raw), good));
+            case DOUBLE:
+                return asdu(TypeIdentification.DOUBLE_POINT_INFORMATION, cause, false,
+                    new InformationObjectWithoutTime_DOUBLE_POINT_INFORMATION(
+                        ioa, new DoublePointInformation(false, false, false, false, ((Number) point.value()).byteValue())));
+            case STEP:
+                return asdu(TypeIdentification.STEP_POSITION_INFORMATION, cause, false,
+                    new InformationObjectWithoutTime_STEP_POSITION_INFORMATION(ioa,
+                        new ValueWithTransientStateIndication(false, (byte) (((Number) point.value()).intValue() & 0x7F)), good));
+            case BITSTRING:
+                return asdu(TypeIdentification.BITSTRING_OF_32_BIT, cause, false,
+                    new InformationObjectWithoutTime_BITSTRING_OF_32_BIT(
+                        ioa, new BinaryStateInformation(((Number) point.value()).longValue()), good));
+            case COUNTER:
+                return asdu(TypeIdentification.INTEGRATED_TOTALS, cause, false,
+                    new InformationObjectWithoutTime_INTEGRATED_TOTALS(ioa,
+                        new BinaryCounterReading(((Number) point.value()).longValue(), false, false, false, (byte) 0)));
             case SINGLE:
             default:
                 return asdu(TypeIdentification.SINGLE_POINT_INFORMATION, cause, false,
@@ -393,9 +639,18 @@ public class Iec104TestStation implements AutoCloseable {
         }
     }
 
+    /** The request mirrored with another cause, keeping its common address. */
     private static ASDU mirror(ASDU request, CauseOfTransmission cause, boolean negative) {
         return new ASDU(request.getTypeIdentification(), false, false, negative, cause,
             request.getOriginatorAddress(), request.getAsduAddressField(), request.getInformationObjects());
+    }
+
+    /** Like {@link #mirror}, but answers a broadcast with the station's own address if so configured. */
+    private ASDU answer(ASDU request, CauseOfTransmission cause, boolean negative) {
+        int address = request.getAsduAddressField() == BROADCAST && answerBroadcastWithOwnAddress
+            ? ASDU_ADDRESS : request.getAsduAddressField();
+        return new ASDU(request.getTypeIdentification(), false, false, negative, cause,
+            request.getOriginatorAddress(), address, request.getInformationObjects());
     }
 
     private static ASDU asdu(TypeIdentification type, CauseOfTransmission cause, boolean negative, InformationObject object) {
@@ -435,6 +690,7 @@ public class Iec104TestStation implements AutoCloseable {
     @Override
     public void close() throws IOException {
         closed = true;
+        scheduler.shutdownNow();
         disconnectClient();
         serverSocket.close();
     }

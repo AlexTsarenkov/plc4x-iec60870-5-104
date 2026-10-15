@@ -32,8 +32,10 @@ initial values, so change both together.
 Everything lives in common address (CA) 1.
 """
 
+import datetime
 import os
 import random
+import time
 import signal
 import sys
 import threading
@@ -80,6 +82,27 @@ m_normalized.value = c104.NormalizedFloat(0.5)
 m_single = station.add_point(io_address=200, type=c104.Type.M_SP_NA_1)
 m_single.value = False
 
+# Double point, written through double command IOA 500.
+m_double = station.add_point(io_address=210, type=c104.Type.M_DP_NA_1)
+m_double.value = c104.Double.OFF
+
+# Step position, moved by step command IOA 600.
+m_step = station.add_point(io_address=220, type=c104.Type.M_ST_NA_1)
+m_step.value = c104.Int7(0)
+
+# Bitstring, written through bitstring command IOA 700.
+m_bits = station.add_point(io_address=230, type=c104.Type.M_BO_NA_1)
+m_bits.value = c104.Byte32(0)
+
+# Counter, only reported on counter interrogation.
+m_counter = station.add_point(io_address=240, type=c104.Type.M_IT_NA_1)
+m_counter.value = 123456
+
+# Difference in seconds between the server clock and the last clock synchronization
+# command received (0.0 = in sync).
+m_clock_offset = station.add_point(io_address=901, type=c104.Type.M_ME_NC_1)
+m_clock_offset.value = -1.0
+
 # ---------------------------------------------------------------------------
 # Control points (client -> station)
 # ---------------------------------------------------------------------------
@@ -119,6 +142,47 @@ c_rejecting.on_receive(callable=reject)
 
 c_single = station.add_point(io_address=400, type=c104.Type.C_SC_NA_1)
 c_single.on_receive(callable=mirror_to(m_single))
+
+# With time tag CP56Time2a.
+c_float_time = station.add_point(io_address=301, type=c104.Type.C_SE_TC_1)
+c_float_time.on_receive(callable=mirror_to(m_float))
+
+c_single_time = station.add_point(io_address=401, type=c104.Type.C_SC_TA_1)
+c_single_time.on_receive(callable=mirror_to(m_single))
+
+# Select-before-operate only: a direct execute is refused.
+c_float_sbo = station.add_point(io_address=302, type=c104.Type.C_SE_NC_1,
+                                command_mode=c104.CommandMode.SELECT_AND_EXECUTE)
+c_float_sbo.on_receive(callable=mirror_to(m_float))
+
+c_double = station.add_point(io_address=500, type=c104.Type.C_DC_NA_1)
+c_double.on_receive(callable=mirror_to(m_double))
+
+
+def step(point: c104.Point, previous_info: c104.Information,
+         message: c104.IncomingMessage) -> c104.ResponseState:
+    delta = 1 if point.value == c104.Step.HIGHER else -1
+    m_step.value = c104.Int7(m_step.value.value + delta)
+    log(f"command {point.type} IOA={point.io_address} value={point.value} -> step position {m_step.value}")
+    m_step.transmit(cause=c104.Cot.RETURN_INFO_REMOTE)
+    return c104.ResponseState.SUCCESS
+
+
+c_step = station.add_point(io_address=600, type=c104.Type.C_RC_NA_1)
+c_step.on_receive(callable=step)
+
+c_bits = station.add_point(io_address=700, type=c104.Type.C_BO_NA_1)
+c_bits.on_receive(callable=mirror_to(m_bits))
+
+
+def on_clock_sync(server: c104.Server, ip: str, date_time: datetime.datetime) -> c104.ResponseState:
+    offset = time.time() - date_time.timestamp()
+    log(f"clock sync from {ip}: {date_time.isoformat()}, offset {offset:.3f} s")
+    m_clock_offset.value = offset
+    return c104.ResponseState.SUCCESS
+
+
+server.on_clock_sync(callable=on_clock_sync)
 
 # ---------------------------------------------------------------------------
 # The slowly changing point. A plain thread instead of Point.on_timer, because

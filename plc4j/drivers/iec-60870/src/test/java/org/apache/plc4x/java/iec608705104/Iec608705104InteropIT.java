@@ -24,6 +24,7 @@ import org.apache.plc4x.java.api.messages.PlcReadResponse;
 import org.apache.plc4x.java.api.messages.PlcSubscriptionEvent;
 import org.apache.plc4x.java.api.messages.PlcWriteResponse;
 import org.apache.plc4x.java.api.types.PlcResponseCode;
+import org.apache.plc4x.java.api.value.PlcValue;
 import org.apache.plc4x.java.iec608705104.readwrite.protocol.Iec608705104Protocol;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
@@ -177,13 +178,91 @@ class Iec608705104InteropIT {
         }
     }
 
+    @Test
+    @Order(5)
+    @Timeout(value = 60, unit = TimeUnit.SECONDS)
+    void doubleStepBitstringAndTimeTaggedCommands() throws Exception {
+        try (PlcConnection connection = connect(null)) {
+            PlcWriteResponse response = connection.writeRequestBuilder()
+                .addTagAddress("double", "1/500:C_DC_NA_1", true)
+                .addTagAddress("step", "1/600:C_RC_NA_1", 2)
+                .addTagAddress("bits", "1/700:C_BO_NA_1", 0x0F0F)
+                .addTagAddress("floatTime", "1/301:C_SE_TC_1", 2.25f)
+                .addTagAddress("singleTime", "1/401:C_SC_TA_1", true)
+                .build().execute().get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            for (String name : response.getTagNames()) {
+                assertEquals(PlcResponseCode.OK, response.getResponseCode(name), name);
+            }
+        }
+        try (PlcConnection connection = connect("read-mode=command&general-interrogation=false")) {
+            PlcReadResponse response = connection.readRequestBuilder()
+                .addTagAddress("double", "1/210")
+                .addTagAddress("step", "1/220")
+                .addTagAddress("bits", "1/230")
+                .addTagAddress("float", "1/100")
+                .addTagAddress("single", "1/200")
+                .build().execute().get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            assertEquals(2, response.getPlcValue("double").getInt(), "on");
+            assertEquals(2, response.getPlcValue("step").getInt(), "two steps up from 0");
+            assertEquals(0x0F0F, response.getPlcValue("bits").getLong());
+            assertEquals(2.25, response.getPlcValue("float").getDouble(), 1e-6);
+            assertEquals(true, response.getPlcValue("single").getBoolean());
+        }
+    }
+
+    @Test
+    @Order(6)
+    @Timeout(value = 60, unit = TimeUnit.SECONDS)
+    void selectBeforeOperate() throws Exception {
+        try (PlcConnection connection = connect("general-interrogation=false")) {
+            assertEquals(PlcResponseCode.REMOTE_ERROR, write(connection, "1/302", 5.5f),
+                "the server only allows select-and-execute on IOA 302");
+            assertEquals(PlcResponseCode.OK, write(connection, "1/302:C_SE_NC_1,sbo", 6.5f));
+        }
+        try (PlcConnection connection = connect("read-mode=command&general-interrogation=false")) {
+            assertEquals(6.5, read(connection, "1/100").getDouble(), 1e-6);
+        }
+    }
+
+    @Test
+    @Order(7)
+    @Timeout(value = 60, unit = TimeUnit.SECONDS)
+    void systemCommands() throws Exception {
+        try (PlcConnection connection = connect("wait-for-termination=true")) {
+            assertEquals(PlcResponseCode.OK, write(connection, "1/0:C_CS_NA_1", 0), "clock synchronization");
+            assertEquals(PlcResponseCode.OK, write(connection, "1/0:C_TS_TA_1", 0), "test command");
+            assertEquals(PlcResponseCode.OK, write(connection, "1/0:C_CI_NA_1", 5), "counter interrogation");
+            PlcReadResponse response = connection.readRequestBuilder()
+                .addTagAddress("counter", "1/240")
+                .build().execute().get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            assertEquals(PlcResponseCode.OK, response.getResponseCode("counter"));
+            assertEquals(123456L, response.getPlcValue("counter").getLong());
+        }
+        try (PlcConnection connection = connect("read-mode=command&general-interrogation=false")) {
+            double offset = read(connection, "1/901").getDouble();
+            assertTrue(Math.abs(offset) < 5, "server clock vs. synchronization: " + offset + " s");
+        }
+    }
+
+    private static PlcResponseCode write(PlcConnection connection, String address, Object value) throws Exception {
+        return connection.writeRequestBuilder().addTagAddress("tag", address, value)
+            .build().execute().get(TIMEOUT_SECONDS, TimeUnit.SECONDS).getResponseCode("tag");
+    }
+
+    private static PlcValue read(PlcConnection connection, String address) throws Exception {
+        PlcReadResponse response = connection.readRequestBuilder().addTagAddress("tag", address)
+            .build().execute().get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        assertEquals(PlcResponseCode.OK, response.getResponseCode("tag"), "read " + address);
+        return response.getPlcValue("tag");
+    }
+
     /**
      * The server sends IOA 101 only every 30 s. A client that does not acknowledge received
      * frames within t2 gets disconnected by the server after t1 (15 s); this one must still be
      * connected and receiving after more than t1.
      */
     @Test
-    @Order(5)
+    @Order(8)
     @Timeout(value = 120, unit = TimeUnit.SECONDS)
     void connectionSurvivesSparseTraffic() throws Exception {
         try (PlcConnection connection = connect(null)) {
