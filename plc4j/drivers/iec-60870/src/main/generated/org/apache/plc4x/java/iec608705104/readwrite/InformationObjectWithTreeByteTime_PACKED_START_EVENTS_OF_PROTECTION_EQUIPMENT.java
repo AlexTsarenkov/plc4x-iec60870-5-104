@@ -44,26 +44,26 @@ public class InformationObjectWithTreeByteTime_PACKED_START_EVENTS_OF_PROTECTION
   }
 
   // Properties.
-  protected final SingleEventOfProtectionEquipment sep;
+  protected final StartEventsOfProtectionEquipment spe;
   protected final QualityDescriptorForPointsOfProtectionEquipment qdp;
   protected final TwoOctetBinaryTime cp16Time2a;
   protected final ThreeOctetBinaryTime cp24Time2a;
 
   public InformationObjectWithTreeByteTime_PACKED_START_EVENTS_OF_PROTECTION_EQUIPMENT(
       int address,
-      SingleEventOfProtectionEquipment sep,
+      StartEventsOfProtectionEquipment spe,
       QualityDescriptorForPointsOfProtectionEquipment qdp,
       TwoOctetBinaryTime cp16Time2a,
       ThreeOctetBinaryTime cp24Time2a) {
     super(address);
-    this.sep = sep;
+    this.spe = spe;
     this.qdp = qdp;
     this.cp16Time2a = cp16Time2a;
     this.cp24Time2a = cp24Time2a;
   }
 
-  public SingleEventOfProtectionEquipment getSep() {
-    return sep;
+  public StartEventsOfProtectionEquipment getSpe() {
+    return spe;
   }
 
   public QualityDescriptorForPointsOfProtectionEquipment getQdp() {
@@ -86,9 +86,9 @@ public class InformationObjectWithTreeByteTime_PACKED_START_EVENTS_OF_PROTECTION
     writeBuffer.pushContext(
         "InformationObjectWithTreeByteTime_PACKED_START_EVENTS_OF_PROTECTION_EQUIPMENT");
 
-    // Simple Field (sep)
+    // Simple Field (spe)
     writeSimpleField(
-        "sep", sep, writeComplex(writeBuffer), WithOption.WithByteOrder(ByteOrder.LITTLE_ENDIAN));
+        "spe", spe, writeComplex(writeBuffer), WithOption.WithByteOrder(ByteOrder.LITTLE_ENDIAN));
 
     // Simple Field (qdp)
     writeSimpleField(
@@ -123,8 +123,8 @@ public class InformationObjectWithTreeByteTime_PACKED_START_EVENTS_OF_PROTECTION
     InformationObjectWithTreeByteTime_PACKED_START_EVENTS_OF_PROTECTION_EQUIPMENT _value = this;
     boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
 
-    // Simple field (sep)
-    lengthInBits += sep.getLengthInBits();
+    // Simple field (spe)
+    lengthInBits += spe.getLengthInBits();
 
     // Simple field (qdp)
     lengthInBits += qdp.getLengthInBits();
@@ -147,10 +147,10 @@ public class InformationObjectWithTreeByteTime_PACKED_START_EVENTS_OF_PROTECTION
     PositionAware positionAware = readBuffer;
     boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
 
-    SingleEventOfProtectionEquipment sep =
+    StartEventsOfProtectionEquipment spe =
         readSimpleField(
-            "sep",
-            readComplex(() -> SingleEventOfProtectionEquipment.staticParse(readBuffer), readBuffer),
+            "spe",
+            readComplex(() -> StartEventsOfProtectionEquipment.staticParse(readBuffer), readBuffer),
             WithOption.WithByteOrder(ByteOrder.LITTLE_ENDIAN));
 
     QualityDescriptorForPointsOfProtectionEquipment qdp =
@@ -177,23 +177,23 @@ public class InformationObjectWithTreeByteTime_PACKED_START_EVENTS_OF_PROTECTION
         "InformationObjectWithTreeByteTime_PACKED_START_EVENTS_OF_PROTECTION_EQUIPMENT");
     // Create the instance
     return new InformationObjectWithTreeByteTime_PACKED_START_EVENTS_OF_PROTECTION_EQUIPMENTBuilderImpl(
-        sep, qdp, cp16Time2a, cp24Time2a);
+        spe, qdp, cp16Time2a, cp24Time2a);
   }
 
   public static
   class InformationObjectWithTreeByteTime_PACKED_START_EVENTS_OF_PROTECTION_EQUIPMENTBuilderImpl
       implements InformationObjectWithTreeByteTime.InformationObjectWithTreeByteTimeBuilder {
-    private final SingleEventOfProtectionEquipment sep;
+    private final StartEventsOfProtectionEquipment spe;
     private final QualityDescriptorForPointsOfProtectionEquipment qdp;
     private final TwoOctetBinaryTime cp16Time2a;
     private final ThreeOctetBinaryTime cp24Time2a;
 
     public InformationObjectWithTreeByteTime_PACKED_START_EVENTS_OF_PROTECTION_EQUIPMENTBuilderImpl(
-        SingleEventOfProtectionEquipment sep,
+        StartEventsOfProtectionEquipment spe,
         QualityDescriptorForPointsOfProtectionEquipment qdp,
         TwoOctetBinaryTime cp16Time2a,
         ThreeOctetBinaryTime cp24Time2a) {
-      this.sep = sep;
+      this.spe = spe;
       this.qdp = qdp;
       this.cp16Time2a = cp16Time2a;
       this.cp24Time2a = cp24Time2a;
@@ -204,7 +204,7 @@ public class InformationObjectWithTreeByteTime_PACKED_START_EVENTS_OF_PROTECTION
       InformationObjectWithTreeByteTime_PACKED_START_EVENTS_OF_PROTECTION_EQUIPMENT
           informationObjectWithTreeByteTime_PACKED_START_EVENTS_OF_PROTECTION_EQUIPMENT =
               new InformationObjectWithTreeByteTime_PACKED_START_EVENTS_OF_PROTECTION_EQUIPMENT(
-                  address, sep, qdp, cp16Time2a, cp24Time2a);
+                  address, spe, qdp, cp16Time2a, cp24Time2a);
       return informationObjectWithTreeByteTime_PACKED_START_EVENTS_OF_PROTECTION_EQUIPMENT;
     }
   }
@@ -220,7 +220,7 @@ public class InformationObjectWithTreeByteTime_PACKED_START_EVENTS_OF_PROTECTION
     }
     InformationObjectWithTreeByteTime_PACKED_START_EVENTS_OF_PROTECTION_EQUIPMENT that =
         (InformationObjectWithTreeByteTime_PACKED_START_EVENTS_OF_PROTECTION_EQUIPMENT) o;
-    return (getSep() == that.getSep())
+    return (getSpe() == that.getSpe())
         && (getQdp() == that.getQdp())
         && (getCp16Time2a() == that.getCp16Time2a())
         && (getCp24Time2a() == that.getCp24Time2a())
@@ -230,7 +230,7 @@ public class InformationObjectWithTreeByteTime_PACKED_START_EVENTS_OF_PROTECTION
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), getSep(), getQdp(), getCp16Time2a(), getCp24Time2a());
+    return Objects.hash(super.hashCode(), getSpe(), getQdp(), getCp16Time2a(), getCp24Time2a());
   }
 
   @Override

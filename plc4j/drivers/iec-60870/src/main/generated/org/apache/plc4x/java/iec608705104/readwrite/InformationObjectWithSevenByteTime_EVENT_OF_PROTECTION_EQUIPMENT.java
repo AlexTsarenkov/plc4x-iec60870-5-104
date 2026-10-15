@@ -44,14 +44,23 @@ public class InformationObjectWithSevenByteTime_EVENT_OF_PROTECTION_EQUIPMENT
   }
 
   // Properties.
+  protected final SingleEventOfProtectionEquipment sep;
   protected final TwoOctetBinaryTime cp16Time2a;
   protected final SevenOctetBinaryTime cp56Time2a;
 
   public InformationObjectWithSevenByteTime_EVENT_OF_PROTECTION_EQUIPMENT(
-      int address, TwoOctetBinaryTime cp16Time2a, SevenOctetBinaryTime cp56Time2a) {
+      int address,
+      SingleEventOfProtectionEquipment sep,
+      TwoOctetBinaryTime cp16Time2a,
+      SevenOctetBinaryTime cp56Time2a) {
     super(address);
+    this.sep = sep;
     this.cp16Time2a = cp16Time2a;
     this.cp56Time2a = cp56Time2a;
+  }
+
+  public SingleEventOfProtectionEquipment getSep() {
+    return sep;
   }
 
   public TwoOctetBinaryTime getCp16Time2a() {
@@ -68,6 +77,10 @@ public class InformationObjectWithSevenByteTime_EVENT_OF_PROTECTION_EQUIPMENT
     PositionAware positionAware = writeBuffer;
     boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
     writeBuffer.pushContext("InformationObjectWithSevenByteTime_EVENT_OF_PROTECTION_EQUIPMENT");
+
+    // Simple Field (sep)
+    writeSimpleField(
+        "sep", sep, writeComplex(writeBuffer), WithOption.WithByteOrder(ByteOrder.LITTLE_ENDIAN));
 
     // Simple Field (cp16Time2a)
     writeSimpleField(
@@ -97,6 +110,9 @@ public class InformationObjectWithSevenByteTime_EVENT_OF_PROTECTION_EQUIPMENT
     InformationObjectWithSevenByteTime_EVENT_OF_PROTECTION_EQUIPMENT _value = this;
     boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
 
+    // Simple field (sep)
+    lengthInBits += sep.getLengthInBits();
+
     // Simple field (cp16Time2a)
     lengthInBits += cp16Time2a.getLengthInBits();
 
@@ -114,6 +130,12 @@ public class InformationObjectWithSevenByteTime_EVENT_OF_PROTECTION_EQUIPMENT
     PositionAware positionAware = readBuffer;
     boolean _lastItem = ThreadLocalHelper.lastItemThreadLocal.get();
 
+    SingleEventOfProtectionEquipment sep =
+        readSimpleField(
+            "sep",
+            readComplex(() -> SingleEventOfProtectionEquipment.staticParse(readBuffer), readBuffer),
+            WithOption.WithByteOrder(ByteOrder.LITTLE_ENDIAN));
+
     TwoOctetBinaryTime cp16Time2a =
         readSimpleField(
             "cp16Time2a",
@@ -129,16 +151,20 @@ public class InformationObjectWithSevenByteTime_EVENT_OF_PROTECTION_EQUIPMENT
     readBuffer.closeContext("InformationObjectWithSevenByteTime_EVENT_OF_PROTECTION_EQUIPMENT");
     // Create the instance
     return new InformationObjectWithSevenByteTime_EVENT_OF_PROTECTION_EQUIPMENTBuilderImpl(
-        cp16Time2a, cp56Time2a);
+        sep, cp16Time2a, cp56Time2a);
   }
 
   public static class InformationObjectWithSevenByteTime_EVENT_OF_PROTECTION_EQUIPMENTBuilderImpl
       implements InformationObjectWithSevenByteTime.InformationObjectWithSevenByteTimeBuilder {
+    private final SingleEventOfProtectionEquipment sep;
     private final TwoOctetBinaryTime cp16Time2a;
     private final SevenOctetBinaryTime cp56Time2a;
 
     public InformationObjectWithSevenByteTime_EVENT_OF_PROTECTION_EQUIPMENTBuilderImpl(
-        TwoOctetBinaryTime cp16Time2a, SevenOctetBinaryTime cp56Time2a) {
+        SingleEventOfProtectionEquipment sep,
+        TwoOctetBinaryTime cp16Time2a,
+        SevenOctetBinaryTime cp56Time2a) {
+      this.sep = sep;
       this.cp16Time2a = cp16Time2a;
       this.cp56Time2a = cp56Time2a;
     }
@@ -147,7 +173,7 @@ public class InformationObjectWithSevenByteTime_EVENT_OF_PROTECTION_EQUIPMENT
       InformationObjectWithSevenByteTime_EVENT_OF_PROTECTION_EQUIPMENT
           informationObjectWithSevenByteTime_EVENT_OF_PROTECTION_EQUIPMENT =
               new InformationObjectWithSevenByteTime_EVENT_OF_PROTECTION_EQUIPMENT(
-                  address, cp16Time2a, cp56Time2a);
+                  address, sep, cp16Time2a, cp56Time2a);
       return informationObjectWithSevenByteTime_EVENT_OF_PROTECTION_EQUIPMENT;
     }
   }
@@ -162,7 +188,8 @@ public class InformationObjectWithSevenByteTime_EVENT_OF_PROTECTION_EQUIPMENT
     }
     InformationObjectWithSevenByteTime_EVENT_OF_PROTECTION_EQUIPMENT that =
         (InformationObjectWithSevenByteTime_EVENT_OF_PROTECTION_EQUIPMENT) o;
-    return (getCp16Time2a() == that.getCp16Time2a())
+    return (getSep() == that.getSep())
+        && (getCp16Time2a() == that.getCp16Time2a())
         && (getCp56Time2a() == that.getCp56Time2a())
         && super.equals(that)
         && true;
@@ -170,7 +197,7 @@ public class InformationObjectWithSevenByteTime_EVENT_OF_PROTECTION_EQUIPMENT
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), getCp16Time2a(), getCp56Time2a());
+    return Objects.hash(super.hashCode(), getSep(), getCp16Time2a(), getCp56Time2a());
   }
 
   @Override

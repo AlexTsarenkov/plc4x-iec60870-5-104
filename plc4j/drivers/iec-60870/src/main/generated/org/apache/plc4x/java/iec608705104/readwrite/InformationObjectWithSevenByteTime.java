@@ -167,6 +167,53 @@ public abstract class InformationObjectWithSevenByteTime extends InformationObje
           InformationObjectWithSevenByteTime_PACKED_OUTPUT_CIRCUIT_INFORMATION_OF_PROTECTION_EQUIPMENT
               .staticParseInformationObjectWithSevenByteTimeBuilder(
                   readBuffer, typeIdentification, numTimeByte);
+    } else if (EvaluationHelper.equals(
+        typeIdentification, TypeIdentification.SINGLE_COMMAND_WITH_TIME_TAG_CP56TIME2A)) {
+      builder =
+          InformationObjectWithSevenByteTime_SINGLE_COMMAND
+              .staticParseInformationObjectWithSevenByteTimeBuilder(
+                  readBuffer, typeIdentification, numTimeByte);
+    } else if (EvaluationHelper.equals(
+        typeIdentification, TypeIdentification.DOUBLE_COMMAND_WITH_TIME_TAG_CP56TIME2A)) {
+      builder =
+          InformationObjectWithSevenByteTime_DOUBLE_COMMAND
+              .staticParseInformationObjectWithSevenByteTimeBuilder(
+                  readBuffer, typeIdentification, numTimeByte);
+    } else if (EvaluationHelper.equals(
+        typeIdentification, TypeIdentification.REGULATING_STEP_COMMAND_WITH_TIME_TAG_CP56TIME2A)) {
+      builder =
+          InformationObjectWithSevenByteTime_REGULATING_STEP_COMMAND
+              .staticParseInformationObjectWithSevenByteTimeBuilder(
+                  readBuffer, typeIdentification, numTimeByte);
+    } else if (EvaluationHelper.equals(
+        typeIdentification,
+        TypeIdentification.MEASURED_VALUE_NORMALISED_VALUE_COMMAND_WITH_TIME_TAG_CP56TIME2A)) {
+      builder =
+          InformationObjectWithSevenByteTime_SET_POINT_COMMAND_NORMALISED_VALUE
+              .staticParseInformationObjectWithSevenByteTimeBuilder(
+                  readBuffer, typeIdentification, numTimeByte);
+    } else if (EvaluationHelper.equals(
+        typeIdentification,
+        TypeIdentification.MEASURED_VALUE_SCALED_VALUE_COMMAND_WITH_TIME_TAG_CP56TIME2A)) {
+      builder =
+          InformationObjectWithSevenByteTime_SET_POINT_COMMAND_SCALED_VALUE
+              .staticParseInformationObjectWithSevenByteTimeBuilder(
+                  readBuffer, typeIdentification, numTimeByte);
+    } else if (EvaluationHelper.equals(
+        typeIdentification,
+        TypeIdentification
+            .MEASURED_VALUE_SHORT_FLOATING_POINT_NUMBER_COMMAND_WITH_TIME_TAG_CP56TIME2A)) {
+      builder =
+          InformationObjectWithSevenByteTime_SET_POINT_COMMAND_SHORT_FLOATING_POINT_NUMBER
+              .staticParseInformationObjectWithSevenByteTimeBuilder(
+                  readBuffer, typeIdentification, numTimeByte);
+    } else if (EvaluationHelper.equals(
+        typeIdentification,
+        TypeIdentification.BITSTRING_OF_32_BIT_COMMAND_WITH_TIME_TAG_CP56TIME2A)) {
+      builder =
+          InformationObjectWithSevenByteTime_BITSTRING_32_BIT_COMMAND
+              .staticParseInformationObjectWithSevenByteTimeBuilder(
+                  readBuffer, typeIdentification, numTimeByte);
     }
     if (builder == null) {
       throw new ParseException(

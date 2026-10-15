@@ -235,6 +235,12 @@ public abstract class InformationObjectWithoutTime extends InformationObject imp
               .staticParseInformationObjectWithoutTimeBuilder(
                   readBuffer, typeIdentification, numTimeByte);
     } else if (EvaluationHelper.equals(
+        typeIdentification, TypeIdentification.TEST_COMMAND_WITH_TIME_TAG_CP56TIME2A)) {
+      builder =
+          InformationObjectWithoutTime_TEST_COMMAND_WITH_TIME_TAG
+              .staticParseInformationObjectWithoutTimeBuilder(
+                  readBuffer, typeIdentification, numTimeByte);
+    } else if (EvaluationHelper.equals(
         typeIdentification, TypeIdentification.PARAMETER_OF_MEASURED_VALUES_NORMALIZED_VALUE)) {
       builder =
           InformationObjectWithoutTime_PARAMETER_OF_MEASURED_VALUES_NORMALIZED_VALUE
