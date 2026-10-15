@@ -128,14 +128,16 @@ class Iec608705104CommandsDriverTest {
 
     @Test
     void readsDoublePointAsCode() throws Exception {
-        connect(null);
+        // ACT_TERM comes after the new value (COT 11), so the cache has it when the write completes.
+        connect("wait-for-termination=true");
         write("1/500:DOUBLE", true);
         assertEquals(2, read("1/210").getInt(), "0 intermediate, 1 off, 2 on, 3 indeterminate");
     }
 
     @Test
     void stepCommandSendsOneCommandPerStep() throws Exception {
-        connect(null);
+        // ACT_TERM comes after the new value (COT 11), so the cache has it when the write completes.
+        connect("wait-for-termination=true");
         assertEquals(PlcResponseCode.OK, write("1/600:C_RC_NA_1", 3));
         assertEquals(3, station.valueOf(220));
         assertEquals(PlcResponseCode.OK, write("1/600:STEP", -5));
@@ -163,7 +165,8 @@ class Iec608705104CommandsDriverTest {
 
     @Test
     void bitstringCommand() throws Exception {
-        connect(null);
+        // ACT_TERM comes after the new value (COT 11), so the cache has it when the write completes.
+        connect("wait-for-termination=true");
         assertEquals(PlcResponseCode.OK, write("1/700:C_BO_NA_1", 0xA5A5A5A5L));
         assertEquals(0xA5A5A5A5L, station.valueOf(230));
         assertEquals(0xA5A5A5A5L, read("1/230").getLong());

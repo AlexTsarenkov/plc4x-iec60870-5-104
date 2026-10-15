@@ -45,12 +45,26 @@ All points live in common address (CA) **1**.
 | 320 | C_SE_NA_1 (normalized setpoint) | control | | Accepted, copied to IOA 120 |
 | 399 | C_SE_NC_1 (float setpoint) | control | | Always rejected (negative ACT_CON) |
 | 400 | C_SC_NA_1 (single command) | control | | Accepted, copied to IOA 200 |
+| 210 | M_DP_NA_1 (double point) | monitoring | OFF | Updated by double command 500 |
+| 220 | M_ST_NA_1 (step position) | monitoring | 0 | Moved by step command 600 |
+| 230 | M_BO_NA_1 (bitstring) | monitoring | 0 | Updated by bitstring command 700 |
+| 240 | M_IT_NA_1 (counter) | monitoring | 123456 | Reported on counter interrogation |
+| 901 | M_ME_NC_1 (float) | monitoring | -1.0 | Server clock minus last clock synchronization time, seconds |
+| 301 | C_SE_TC_1 (float set point with time tag) | control | | Accepted, copied to IOA 100 |
+| 302 | C_SE_NC_1 (float set point) | control | | Select-and-execute only (direct is refused), copied to IOA 100 |
+| 401 | C_SC_TA_1 (single command with time tag) | control | | Accepted, copied to IOA 200 |
+| 500 | C_DC_NA_1 (double command) | control | | Accepted, copied to IOA 210 |
+| 600 | C_RC_NA_1 (regulating step command) | control | | Accepted, IOA 220 one step up/down |
+| 700 | C_BO_NA_1 (bitstring command) | control | | Accepted, copied to IOA 230 |
 
 After a command is accepted, the new value of the monitoring point is sent with
 cause of transmission *return information caused by a remote command* (COT 11).
 
 The station answers general interrogation (C_IC_NA_1) and read commands
-(C_RD_NA_1) for all monitoring points.
+(C_RD_NA_1) for all monitoring points, counter interrogation (C_CI_NA_1, general),
+clock synchronization (C_CS_NA_1) and the test command with time tag (C_TS_TA_1).
+Reset process, delay acquisition, C_TS_NA_1 and parameters (P_ME, P_AC) are not
+supported by c104; the driver's tests cover them against the Java test station.
 
 ## Environment variables
 
