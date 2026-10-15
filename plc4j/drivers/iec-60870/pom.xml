@@ -34,7 +34,7 @@
     which is why the driver can be built on its own. Bump the last number for every
     release of the fork, see MAINTENANCE.md, "Versions".
   -->
-  <version>0.13.1-iec104.1</version>
+  <version>0.13.1-iec104.2</version>
 
   <name>PLC4J: Driver: IEC-60870</name>
   <description>Implementation of a PLC4X driver for the IEC 60870-5-104 protocol.</description>
@@ -198,7 +198,8 @@
         <dependency>
           <groupId>org.apache.plc4x</groupId>
           <artifactId>plc4x-protocols-iec-60870</artifactId>
-          <version>0.13.1</version>
+          <!-- Fork: the changed mspec of this fork, built from protocols/iec-60870. -->
+          <version>0.13.1-iec104.2</version>
           <!-- Scope is 'provided' as this way it's not shipped with the driver -->
           <scope>provided</scope>
         </dependency>

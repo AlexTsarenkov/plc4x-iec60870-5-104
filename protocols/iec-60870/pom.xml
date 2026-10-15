@@ -28,6 +28,12 @@
   </parent>
 
   <artifactId>plc4x-protocols-iec-60870</artifactId>
+  <!--
+    Fork: own version because the mspec was changed (time-tagged commands, protection
+    events, C_TS_TA_1). Only needed to regenerate the driver's code, see the driver's
+    MAINTENANCE.md, "Regenerating the protocol code". Keep it equal to the driver's version.
+  -->
+  <version>0.13.1-iec104.2</version>
 
   <name>Protocols: IEC-60870</name>
   <description>Base protocol specifications for the IEC-60870 protocol family</description>

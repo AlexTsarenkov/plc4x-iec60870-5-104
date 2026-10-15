@@ -71,6 +71,27 @@ jobs:
           ./mvnw $MAVEN_ARGS -pl plc4j/drivers/iec-60870 dependency:resolve \
             2>&1 | tee ci-results/01-build-dependencies.log
 
+      # The generated message classes (src/main/generated) are committed. CI regenerates
+      # them from the mspec of this fork and the build below uses the result, so the tests
+      # always run against what the mspec says. If the committed code differs, the
+      # difference is published as generated.patch and the last step fails: apply the
+      # patch and commit it. See MAINTENANCE.md, "Regenerating the protocol code".
+      - name: Regenerate protocol code from the mspec
+        run: |
+          set -o pipefail
+          ./mvnw $MAVEN_ARGS -pl protocols/iec-60870 install -DskipTests \
+            2>&1 | tee ci-results/01b-protocol.log
+          ./mvnw $MAVEN_ARGS -P update-generated-code -pl plc4j/drivers/iec-60870 generate-sources \
+            2>&1 | tee -a ci-results/01b-protocol.log
+          git add -N plc4j/drivers/iec-60870/src/main/generated
+          git diff --binary -- plc4j/drivers/iec-60870/src/main/generated > ci-results/generated.patch
+          if [ -s ci-results/generated.patch ]; then
+            echo "Generated code differs from the committed code, see generated.patch"
+            git diff --stat -- plc4j/drivers/iec-60870/src/main/generated | tail -5
+          else
+            rm ci-results/generated.patch
+          fi
+
       - name: Start IEC 104 test server (c104)
         run: |
           set -o pipefail
@@ -132,6 +153,14 @@ jobs:
         with:
           name: iec104-ci-results
           path: ci-results
+
+      - name: Committed generated code is up to date
+        run: |
+          if [ -f ci-results/generated.patch ]; then
+            echo "src/main/generated is not what the mspec generates." >&2
+            echo "Apply generated.patch from the ci-results branch and commit it." >&2
+            exit 1
+          fi
 
       # The built driver jar, downloadable from the run page.
       - uses: actions/upload-artifact@v4

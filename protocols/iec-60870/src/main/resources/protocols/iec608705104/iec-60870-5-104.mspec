@@ -172,6 +172,11 @@
                 ['DELAY_ACQUISITION_COMMAND'                                *_DELAY_ACQUISITION_COMMAND
                     [simple TwoOctetBinaryTime cp16Time2a]
                 ]
+                // Fork: was missing (IEC 60870-5-104, 8.8). TSC, then CP56Time2a.
+                ['TEST_COMMAND_WITH_TIME_TAG_CP56TIME2A'                    *_TEST_COMMAND_WITH_TIME_TAG
+                    [simple uint 16 testSequenceCounter]
+                    [simple SevenOctetBinaryTime cp56Time2a]
+                ]
                 ['PARAMETER_OF_MEASURED_VALUES_NORMALIZED_VALUE'            *_PARAMETER_OF_MEASURED_VALUES_NORMALIZED_VALUE
                     [simple NormalizedValue nva]
                     [simple QualifierOfParameterOfMeasuredValues qpm]
@@ -269,11 +274,14 @@
                     [simple ThreeOctetBinaryTime cp24Time2a]
                 ]
                 ['EVENT_OF_PROTECTION_EQUIPMENT_WITH_TIME_TAG'              *_EVENT_OF_PROTECTION_EQUIPMENT
+                    // Fork: the SEP was missing (IEC 60870-5-101, 7.3.1.17 / 7.3.1.30)
+                    [simple SingleEventOfProtectionEquipment sep]
                     [simple TwoOctetBinaryTime cp16Time2a]
                     [simple ThreeOctetBinaryTime cp24Time2a]
                 ]
                 ['PACKED_START_EVENTS_OF_PROTECTION_EQUIPMENT_WITH_TIME_TAG' *_PACKED_START_EVENTS_OF_PROTECTION_EQUIPMENT
-                    [simple SingleEventOfProtectionEquipment sep]
+                    // Fork: start events (SPE), was a single event (SEP) (IEC 60870-5-101, 7.3.1.18 / 7.3.1.31)
+                    [simple StartEventsOfProtectionEquipment spe]
                     [simple QualityDescriptorForPointsOfProtectionEquipment qdp]
                     [simple TwoOctetBinaryTime cp16Time2a]
                     [simple ThreeOctetBinaryTime cp24Time2a]
@@ -327,11 +335,14 @@
                     [simple SevenOctetBinaryTime cp56Time2a]
                 ]
                 ['EVENT_OF_PROTECTION_EQUIPMENT_WITH_TIME_TAG_CP56TIME2A'   *_EVENT_OF_PROTECTION_EQUIPMENT
+                    // Fork: the SEP was missing (IEC 60870-5-101, 7.3.1.17 / 7.3.1.30)
+                    [simple SingleEventOfProtectionEquipment sep]
                     [simple TwoOctetBinaryTime cp16Time2a]
                     [simple SevenOctetBinaryTime cp56Time2a]
                 ]
                 ['PACKED_START_EVENTS_OF_PROTECTION_EQUIPMENT_WITH_TIME_TAG_CP56TIME2A' *_PACKED_START_EVENTS_OF_PROTECTION_EQUIPMENT
-                    [simple SingleEventOfProtectionEquipment sep]
+                    // Fork: start events (SPE), was a single event (SEP) (IEC 60870-5-101, 7.3.1.18 / 7.3.1.31)
+                    [simple StartEventsOfProtectionEquipment spe]
                     [simple QualityDescriptorForPointsOfProtectionEquipment qdp]
                     [simple TwoOctetBinaryTime cp16Time2a]
                     [simple SevenOctetBinaryTime cp56Time2a]
@@ -342,22 +353,40 @@
                     [simple TwoOctetBinaryTime cp16Time2a]
                     [simple SevenOctetBinaryTime cp56Time2a]
                 ]
-                /*['SINGLE_COMMAND_WITH_TIME_TAG_CP56TIME2A'                  *_SINGLE_COMMAND
+                // Fork: commands with time tag CP56Time2a (IEC 60870-5-104, 8.1, types 58..64).
+                // Upstream had them commented out without fields. The time tag follows the
+                // information elements, as for the monitoring types above.
+                ['SINGLE_COMMAND_WITH_TIME_TAG_CP56TIME2A'                  *_SINGLE_COMMAND
+                    [simple SingleCommand sco]
+                    [simple SevenOctetBinaryTime cp56Time2a]
                 ]
                 ['DOUBLE_COMMAND_WITH_TIME_TAG_CP56TIME2A'                  *_DOUBLE_COMMAND
+                    [simple DoubleCommand dco]
+                    [simple SevenOctetBinaryTime cp56Time2a]
                 ]
                 ['REGULATING_STEP_COMMAND_WITH_TIME_TAG_CP56TIME2A'         *_REGULATING_STEP_COMMAND
+                    [simple RegulatingStepCommand rco]
+                    [simple SevenOctetBinaryTime cp56Time2a]
                 ]
-                ['MEASURED_VALUE_NORMALISED_VALUE_COMMAND_WITH_TIME_TAG_CP56TIME2A' *_MEASURED_VALUE_NORMALISED_VALUE_COMMAND
+                ['MEASURED_VALUE_NORMALISED_VALUE_COMMAND_WITH_TIME_TAG_CP56TIME2A' *_SET_POINT_COMMAND_NORMALISED_VALUE
+                    [simple NormalizedValue nva]
+                    [simple QualifierOfSetPointCommand qos]
+                    [simple SevenOctetBinaryTime cp56Time2a]
                 ]
-                ['MEASURED_VALUE_SCALED_VALUE_COMMAND_WITH_TIME_TAG_CP56TIME2A' *_MEASURED_VALUE_SCALED_VALUE_COMMAND
+                ['MEASURED_VALUE_SCALED_VALUE_COMMAND_WITH_TIME_TAG_CP56TIME2A' *_SET_POINT_COMMAND_SCALED_VALUE
+                    [simple ScaledValue sva]
+                    [simple QualifierOfSetPointCommand qos]
+                    [simple SevenOctetBinaryTime cp56Time2a]
                 ]
-                ['MEASURED_VALUE_SHORT_FLOATING_POINT_NUMBER_COMMAND_WITH_TIME_TAG_CP56TIME2A' *_MEASURED_VALUE_SHORT_FLOATING_POINT_NUMBER_COMMAND
+                ['MEASURED_VALUE_SHORT_FLOATING_POINT_NUMBER_COMMAND_WITH_TIME_TAG_CP56TIME2A' *_SET_POINT_COMMAND_SHORT_FLOATING_POINT_NUMBER
+                    [simple float 32 value]
+                    [simple QualifierOfSetPointCommand qos]
+                    [simple SevenOctetBinaryTime cp56Time2a]
                 ]
-                ['BITSTRING_OF_32_BIT_COMMAND_WITH_TIME_TAG_CP56TIME2A'     *_BITSTRING_OF_32_BIT_COMMAND
+                ['BITSTRING_OF_32_BIT_COMMAND_WITH_TIME_TAG_CP56TIME2A'     *_BITSTRING_32_BIT_COMMAND
+                    [simple BinaryStateInformation bsi]
+                    [simple SevenOctetBinaryTime cp56Time2a]
                 ]
-                ['TEST_COMMAND_WITH_TIME_TAG_CP56TIME2A'                    *_TEST_COMMAND
-                ]*/
             ]
         ]
     ]
