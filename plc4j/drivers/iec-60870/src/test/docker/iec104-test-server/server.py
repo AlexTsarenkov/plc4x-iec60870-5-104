@@ -159,10 +159,15 @@ c_double = station.add_point(io_address=500, type=c104.Type.C_DC_NA_1)
 c_double.on_receive(callable=mirror_to(m_double))
 
 
+# The step position is kept here: c104 2.2's Int7 does not expose its number.
+step_position = 0
+
+
 def step(point: c104.Point, previous_info: c104.Information,
          message: c104.IncomingMessage) -> c104.ResponseState:
-    delta = 1 if point.value == c104.Step.HIGHER else -1
-    m_step.value = c104.Int7(m_step.value.value + delta)
+    global step_position
+    step_position += 1 if point.value == c104.Step.HIGHER else -1
+    m_step.value = c104.Int7(step_position)
     log(f"command {point.type} IOA={point.io_address} value={point.value} -> step position {m_step.value}")
     m_step.transmit(cause=c104.Cot.RETURN_INFO_REMOTE)
     return c104.ResponseState.SUCCESS
