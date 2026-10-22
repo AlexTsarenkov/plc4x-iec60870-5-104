@@ -1,0 +1,17 @@
+[ {
+    "name" : "Control-OK",
+    "address" : "1/2:C_SE_NC_1",
+    "value" : 24.4
+}, {
+    "name" : "Unknown-IOA",
+    "address" : "1/9999:C_SE_NC_1",
+    "value" : 1.0
+}, {
+    "name" : "Unknown-CA",
+    "address" : "7/1:C_SE_NC_1",
+    "value" : 1.0
+}, {
+    "name" : "Wrong-Type-For-Point",
+    "address" : "1/1:C_SE_NB_1",
+    "value" : 5
+} ]

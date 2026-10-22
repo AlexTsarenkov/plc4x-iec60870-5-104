@@ -1,0 +1,12 @@
+[
+    {
+        "name": "Group-1-Interrogation",
+        "address": "1/0:C_IC_NA_1",
+        "value": 21
+    },
+    {
+        "name": "Counter-Freeze",
+        "address": "1/0:C_CI_NA_1,frz=freeze",
+        "value": 5
+    }
+]

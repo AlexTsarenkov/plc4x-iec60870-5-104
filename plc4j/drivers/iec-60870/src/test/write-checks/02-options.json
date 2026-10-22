@@ -1,0 +1,25 @@
+[ {
+    "name" : "Single-SBO",
+    "address" : "1/13:C_SC_NA_1,sbo",
+    "value" : true
+}, {
+    "name" : "Single-Short-Pulse",
+    "address" : "1/14:C_SC_NA_1,qu=short",
+    "value" : true
+}, {
+    "name" : "Double-Direct",
+    "address" : "1/23:C_DC_NA_1,direct",
+    "value" : false
+}, {
+    "name" : "Step-SBO",
+    "address" : "1/33:C_RC_NA_1,sbo",
+    "value" : 2
+}, {
+    "name" : "Float-SBO",
+    "address" : "1/62:C_SE_NC_1,sbo,ql=0",
+    "value" : 42.0
+}, {
+    "name" : "Float-Time-Option",
+    "address" : "1/63:C_SE_NC_1,time",
+    "value" : 7.5
+} ]

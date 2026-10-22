@@ -1,0 +1,13 @@
+[ {
+    "name" : "Reset-Process",
+    "address" : "1/0:C_RP_NA_1",
+    "value" : 1
+}, {
+    "name" : "Delay-Acquisition",
+    "address" : "1/0:C_CD_NA_1",
+    "value" : 500
+}, {
+    "name" : "Test-Command-Without-Time",
+    "address" : "1/0:C_TS_NA_1",
+    "value" : 0
+} ]

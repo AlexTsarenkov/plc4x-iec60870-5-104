@@ -98,6 +98,19 @@
           </instructions>
         </configuration>
       </plugin>
+      <!--
+        Fork: the JSON files of the manual write checks (src/test/write-checks) cannot carry a
+        license header (JSON has no comments), so the license check skips them.
+      -->
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <configuration>
+          <excludes combine.children="append">
+            <exclude>src/test/write-checks/*.json</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 

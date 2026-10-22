@@ -1,0 +1,21 @@
+[ {
+    "name" : "Param-Float-Threshold",
+    "address" : "1/1001:P_ME_NC_1,kpa=threshold",
+    "value" : 0.5
+}, {
+    "name" : "Param-Scaled-High-Limit",
+    "address" : "1/1002:P_ME_NB_1,kpa=high",
+    "value" : 900
+}, {
+    "name" : "Param-Normalized-Smoothing",
+    "address" : "1/1003:P_ME_NA_1,kpa=smoothing",
+    "value" : 0.1
+}, {
+    "name" : "Param-Activate",
+    "address" : "1/1001:P_AC_NA_1",
+    "value" : 3
+}, {
+    "name" : "Param-Deactivate",
+    "address" : "1/1001:P_AC_NA_1,deact",
+    "value" : 3
+} ]

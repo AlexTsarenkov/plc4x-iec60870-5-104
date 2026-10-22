@@ -1,0 +1,22 @@
+[
+    {
+        "name": "General-Interrogation",
+        "address": "1/0:C_IC_NA_1",
+        "value": 20
+    },
+    {
+        "name": "Counter-Interrogation",
+        "address": "1/0:C_CI_NA_1",
+        "value": 5
+    },
+    {
+        "name": "Clock-Sync-Now",
+        "address": "1/0:C_CS_NA_1",
+        "value": 0
+    },
+    {
+        "name": "Test-Command",
+        "address": "1/0:C_TS_TA_1",
+        "value": 0
+    }
+]

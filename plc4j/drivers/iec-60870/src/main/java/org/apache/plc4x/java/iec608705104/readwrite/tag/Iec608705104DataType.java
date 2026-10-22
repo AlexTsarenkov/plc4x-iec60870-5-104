@@ -59,7 +59,8 @@ public enum Iec608705104DataType {
 
     /**
      * Double command: on/off as two bits (DCS 1 = off, 2 = on), typical for circuit breakers.
-     * Value: boolean ({@code true} = on), or the DCS code 1/2.
+     * Value: boolean ({@code true} = on) or the string "ON"/"OFF". Numbers are rejected, see
+     * {@code Iec104Commands}.
      */
     DOUBLE("C_DC_NA_1", TypeIdentification.DOUBLE_COMMAND,
         "C_DC_TA_1", TypeIdentification.DOUBLE_COMMAND_WITH_TIME_TAG_CP56TIME2A,

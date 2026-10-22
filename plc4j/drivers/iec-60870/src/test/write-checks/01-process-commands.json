@@ -1,0 +1,81 @@
+[ {
+    "name" : "Single-On",
+    "address" : "1/10:C_SC_NA_1",
+    "value" : true
+}, {
+    "name" : "Single-Off-Number",
+    "address" : "1/11:C_SC_NA_1",
+    "value" : 0
+}, {
+    "name" : "Single-Time",
+    "address" : "1/12:C_SC_TA_1",
+    "value" : true
+}, {
+    "name" : "Double-On",
+    "address" : "1/20:C_DC_NA_1",
+    "value" : true
+}, {
+    "name" : "Double-Off-Text",
+    "address" : "1/21:C_DC_NA_1",
+    "value" : "OFF"
+}, {
+    "name" : "Double-Time",
+    "address" : "1/22:C_DC_TA_1",
+    "value" : "ON"
+}, {
+    "name" : "Step-Up-3",
+    "address" : "1/30:C_RC_NA_1",
+    "value" : 3
+}, {
+    "name" : "Step-Down-2",
+    "address" : "1/31:C_RC_NA_1",
+    "value" : -2
+}, {
+    "name" : "Step-Time",
+    "address" : "1/32:C_RC_TA_1",
+    "value" : 1
+}, {
+    "name" : "Normalized-Half",
+    "address" : "1/40:C_SE_NA_1",
+    "value" : 0.5
+}, {
+    "name" : "Normalized-Min",
+    "address" : "1/41:C_SE_NA_1",
+    "value" : -1.0
+}, {
+    "name" : "Normalized-Time",
+    "address" : "1/42:C_SE_TA_1",
+    "value" : 0.25
+}, {
+    "name" : "Scaled",
+    "address" : "1/50:C_SE_NB_1",
+    "value" : 1234
+}, {
+    "name" : "Scaled-Min",
+    "address" : "1/51:C_SE_NB_1",
+    "value" : -32768
+}, {
+    "name" : "Scaled-Time",
+    "address" : "1/52:C_SE_TB_1",
+    "value" : 100
+}, {
+    "name" : "Float-Negative",
+    "address" : "1/60:C_SE_NC_1",
+    "value" : -12.75
+}, {
+    "name" : "Float-Time",
+    "address" : "1/61:C_SE_TC_1",
+    "value" : 99.9
+}, {
+    "name" : "Bitstring",
+    "address" : "1/70:C_BO_NA_1",
+    "value" : 255
+}, {
+    "name" : "Bitstring-All-Bits",
+    "address" : "1/71:C_BO_NA_1",
+    "value" : 4294967295
+}, {
+    "name" : "Bitstring-Time",
+    "address" : "1/72:C_BO_TA_1",
+    "value" : 1
+} ]

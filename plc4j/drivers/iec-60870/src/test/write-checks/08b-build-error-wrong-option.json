@@ -1,0 +1,5 @@
+[ {
+    "name" : "Option-Not-For-Setpoint",
+    "address" : "1/1:C_SE_NC_1,qu=short",
+    "value" : 1.0
+} ]

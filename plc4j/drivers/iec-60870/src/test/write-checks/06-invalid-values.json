@@ -1,0 +1,53 @@
+[ {
+    "name" : "Control-OK",
+    "address" : "1/2:C_SE_NC_1",
+    "value" : 24.4
+}, {
+    "name" : "Double-Number",
+    "address" : "1/20:C_DC_NA_1",
+    "value" : 1
+}, {
+    "name" : "Double-Bad-Text",
+    "address" : "1/20:C_DC_NA_1",
+    "value" : "MAYBE"
+}, {
+    "name" : "Step-Zero",
+    "address" : "1/30:C_RC_NA_1",
+    "value" : 0
+}, {
+    "name" : "Step-Too-Many",
+    "address" : "1/30:C_RC_NA_1",
+    "value" : 65
+}, {
+    "name" : "Step-Fraction",
+    "address" : "1/30:C_RC_NA_1",
+    "value" : 1.5
+}, {
+    "name" : "Normalized-Too-Big",
+    "address" : "1/40:C_SE_NA_1",
+    "value" : 1.5
+}, {
+    "name" : "Normalized-Exactly-One",
+    "address" : "1/40:C_SE_NA_1",
+    "value" : 1.0
+}, {
+    "name" : "Float-NaN",
+    "address" : "1/60:C_SE_NC_1",
+    "value" : "NaN"
+}, {
+    "name" : "Bitstring-33-Bits",
+    "address" : "1/70:C_BO_NA_1",
+    "value" : 4294967296
+}, {
+    "name" : "Bitstring-Fraction",
+    "address" : "1/70:C_BO_NA_1",
+    "value" : 1.5
+}, {
+    "name" : "Reset-Bad-Qualifier",
+    "address" : "1/0:C_RP_NA_1",
+    "value" : 300
+}, {
+    "name" : "Delay-Too-Long",
+    "address" : "1/0:C_CD_NA_1",
+    "value" : 60000
+} ]

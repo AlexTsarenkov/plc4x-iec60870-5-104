@@ -1,0 +1,5 @@
+[ {
+    "name" : "Float-Out-Of-Range",
+    "address" : "1/1:C_SE_NC_1",
+    "value" : 1e39
+} ]
