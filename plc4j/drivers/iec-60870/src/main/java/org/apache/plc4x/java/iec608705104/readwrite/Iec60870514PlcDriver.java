@@ -52,9 +52,15 @@ public class Iec60870514PlcDriver extends GeneratedDriverBase<APDU> {
         return "iec-60870-5-104";
     }
 
+    /**
+     * Fork: the "-LSP" suffix marks this fork's driver. PLC4X logs the name at startup
+     * ("Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)"), so the log
+     * shows whether the fork or the upstream driver was loaded. The protocol code above is
+     * unchanged, connection strings stay the same.
+     */
     @Override
     public String getProtocolName() {
-        return "IEC 60870-5-104";
+        return "IEC 60870-5-104-LSP";
     }
 
     /**
