@@ -1,0 +1,68 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.22kB 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.12-slim
+#2 ...
+
+#3 [auth] library/python:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.12-slim
+#2 DONE 0.9s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 8.47kB done
+#5 DONE 0.0s
+
+#6 [1/3] FROM docker.io/library/python:3.12-slim@sha256:cb33f7f771ecec2ef1225cf39b159591a040391bd73e4c01f00fdfc4c47611d2
+#6 resolve docker.io/library/python:3.12-slim@sha256:cb33f7f771ecec2ef1225cf39b159591a040391bd73e4c01f00fdfc4c47611d2 done
+#6 sha256:b524bb3aba7394d85233f3a0a742b8f1b56179e8f61492f73d42a1ff118623b7 0B / 12.12MB 0.1s
+#6 sha256:cb33f7f771ecec2ef1225cf39b159591a040391bd73e4c01f00fdfc4c47611d2 10.37kB / 10.37kB done
+#6 sha256:e8a38829209aea82774882e5157e1f7c3e8c8393ff53a697b3580896e57f345c 1.75kB / 1.75kB done
+#6 sha256:a33c10a97f11005523814c6eee013986119fe41f3122f444518117536675c8e1 5.66kB / 5.66kB done
+#6 sha256:f2be67225471500c788ce88c597eb5ea8336e912ad1ca4815650e0281afe2034 3.15MB / 29.84MB 0.1s
+#6 sha256:be6443c06d3c9914acdca3ffb368adad23d4f282b55e71e730878ad3e3c3f75c 0B / 1.29MB 0.1s
+#6 sha256:f2be67225471500c788ce88c597eb5ea8336e912ad1ca4815650e0281afe2034 27.26MB / 29.84MB 0.2s
+#6 sha256:be6443c06d3c9914acdca3ffb368adad23d4f282b55e71e730878ad3e3c3f75c 1.29MB / 1.29MB 0.2s done
+#6 sha256:5c397e4307db7bd392eff1d36de88b04da2a137a4b906b7e0e4657bada560645 0B / 249B 0.2s
+#6 sha256:b524bb3aba7394d85233f3a0a742b8f1b56179e8f61492f73d42a1ff118623b7 12.12MB / 12.12MB 0.3s done
+#6 sha256:f2be67225471500c788ce88c597eb5ea8336e912ad1ca4815650e0281afe2034 29.84MB / 29.84MB 0.2s done
+#6 sha256:5c397e4307db7bd392eff1d36de88b04da2a137a4b906b7e0e4657bada560645 249B / 249B 0.3s done
+#6 extracting sha256:f2be67225471500c788ce88c597eb5ea8336e912ad1ca4815650e0281afe2034 0.1s
+#6 extracting sha256:f2be67225471500c788ce88c597eb5ea8336e912ad1ca4815650e0281afe2034 0.9s done
+#6 extracting sha256:be6443c06d3c9914acdca3ffb368adad23d4f282b55e71e730878ad3e3c3f75c
+#6 extracting sha256:be6443c06d3c9914acdca3ffb368adad23d4f282b55e71e730878ad3e3c3f75c 0.1s done
+#6 extracting sha256:b524bb3aba7394d85233f3a0a742b8f1b56179e8f61492f73d42a1ff118623b7
+#6 extracting sha256:b524bb3aba7394d85233f3a0a742b8f1b56179e8f61492f73d42a1ff118623b7 0.5s done
+#6 extracting sha256:5c397e4307db7bd392eff1d36de88b04da2a137a4b906b7e0e4657bada560645 done
+#6 DONE 2.5s
+
+#7 [2/3] RUN pip install --no-cache-dir "c104>=2,<3"
+#7 1.503 Collecting c104<3,>=2
+#7 1.525   Downloading c104-2.2.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (48 kB)
+#7 1.541 Downloading c104-2.2.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (954 kB)
+#7 1.559    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 954.1/954.1 kB 76.9 MB/s eta 0:00:00
+#7 1.573 Installing collected packages: c104
+#7 1.591 Successfully installed c104-2.2.1
+#7 1.592 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#7 1.648 
+#7 1.648 [notice] A new release of pip is available: 25.0.1 -> 26.2.2
+#7 1.648 [notice] To update, run: pip install --upgrade pip
+#7 DONE 1.7s
+
+#8 [3/3] COPY server.py /app/server.py
+#8 DONE 0.0s
+
+#9 exporting to image
+#9 exporting layers
+#9 exporting layers 1.0s done
+#9 writing image sha256:3084cbccba9fe0b290f546905aef0f0c47dcc39ac14ce0407ffaf77c291f9e47 done
+#9 naming to docker.io/library/iec104-test-server done
+#9 DONE 1.0s

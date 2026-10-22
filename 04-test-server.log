@@ -1,0 +1,22 @@
+IEC 60870-5-104 test server listening on 0.0.0.0:2404, CA=1
+spontaneous IOA=101 value=34.77000045776367
+spontaneous IOA=101 value=34.040000915527344
+spontaneous IOA=101 value=17.729999542236328
+spontaneous IOA=101 value=26.329999923706055
+command Type.C_SE_NC_1 IOA=300 value=33.25 -> IOA 100
+command Type.C_SE_NA_1 IOA=320 value=-0.250000 -> IOA 120
+command Type.C_SE_NB_1 IOA=310 value=-42 -> IOA 110
+command Type.C_SC_NA_1 IOA=400 value=True -> IOA 200
+command Type.C_SE_NC_1 IOA=399 value=1.0 -> rejected
+command Type.C_BO_NA_1 IOA=700 value=0b00000000000000000000111100001111 -> IOA 230
+command Type.C_DC_NA_1 IOA=500 value=Double.ON -> IOA 210
+command Type.C_SE_TC_1 IOA=301 value=2.25 -> IOA 100
+command Type.C_SC_TA_1 IOA=401 value=True -> IOA 200
+command Type.C_RC_NA_1 IOA=600 value=Step.HIGHER -> step position 1
+command Type.C_RC_NA_1 IOA=600 value=Step.HIGHER -> step position 2
+[c104.Server] Cannot execute command on point in SELECT_AND_EXECUTE command mode without selection
+command Type.C_SE_NC_1 IOA=302 value=6.5 -> IOA 100
+clock sync from 172.17.0.1:52096: 2026-10-22T13:34:31.477000, offset 0.001 s
+spontaneous IOA=101 value=51.099998474121094
+spontaneous IOA=101 value=8.170000076293945
+spontaneous IOA=101 value=30.510000228881836
