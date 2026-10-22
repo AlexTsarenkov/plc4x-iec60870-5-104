@@ -250,6 +250,14 @@ public class Iec608705104Protocol extends Plc4xProtocolBase<APDU>
      */
     private final CompletableFuture<Void> initialInterrogation = new CompletableFuture<>();
 
+    /**
+     * A general interrogation sent by the driver itself (after STARTDT or M_EI_NA_1) is
+     * running: sent, and neither finished (ACT_TERM), rejected nor timed out. Many stations
+     * (FreyrSCADA, lib60870) send M_EI_NA_1 right after every connect, crossing the
+     * driver's first GI; a second GI then would only deliver every value twice.
+     */
+    private boolean interrogationRunning;
+
     private final Map<CommandKey, Deque<PendingCommand>> pendingCommands = new HashMap<>();
     private final Map<ObjectKey, Deque<CompletableFuture<PlcResponseItem<PlcValue>>>> pendingReads = new HashMap<>();
 
@@ -552,23 +560,31 @@ public class Iec608705104Protocol extends Plc4xProtocolBase<APDU>
         } else if (cause == CauseOfTransmission.TERMINATION_ACTIVATION_ACTTERM) {
             LOGGER.debug("General interrogation of {} finished, {} values cached",
                 asdu.getAsduAddressField(), valueCache.size());
+            interrogationRunning = false;
             initialInterrogation.complete(null);
         } else {
             LOGGER.warn("General interrogation of {} rejected by the station (cause {}, negative {})",
                 asdu.getAsduAddressField(), cause, asdu.getNegative());
+            interrogationRunning = false;
             initialInterrogation.complete(null);
         }
     }
 
     /**
      * The station (re)started. Its values may have changed while it was down, so we ask for
-     * all of them again.
+     * all of them again, unless a general interrogation is already running: its answer
+     * comes after the restart and is current.
      */
     private void onEndOfInitialisation(ASDU asdu) {
         LOGGER.info("Station {} reports end of initialization", asdu.getAsduAddressField());
-        if (configuration.isGeneralInterrogation()) {
-            sendGeneralInterrogation();
+        if (!configuration.isGeneralInterrogation()) {
+            return;
         }
+        if (interrogationRunning) {
+            LOGGER.debug("General interrogation already running, not sending another one");
+            return;
+        }
+        sendGeneralInterrogation();
     }
 
     /**
@@ -897,7 +913,9 @@ public class Iec608705104Protocol extends Plc4xProtocolBase<APDU>
         LOGGER.debug("Sending general interrogation to {}", configuration.getInterrogationAsduAddress());
         linkLayer.sendAsdu(Iec104Commands.createGeneralInterrogation(
             configuration.getInterrogationAsduAddress(), configuration.getOriginatorAddress()), System.nanoTime());
+        interrogationRunning = true;
         channel.eventLoop().schedule(() -> {
+            interrogationRunning = false;
             if (initialInterrogation.complete(null)) {
                 LOGGER.warn("General interrogation not finished within {} ms, reads use the values received so far",
                     configuration.getInterrogationTimeoutMillis());

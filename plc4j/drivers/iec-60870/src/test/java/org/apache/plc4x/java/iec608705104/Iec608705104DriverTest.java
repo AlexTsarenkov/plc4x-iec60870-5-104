@@ -134,9 +134,22 @@ class Iec608705104DriverTest {
     @Test
     void interrogatesAgainAfterEndOfInitialisation() throws Exception {
         connect(null);
-        awaitAsdu(TypeIdentification.INTERROGATION_COMMAND);
+        // A read from the cache waits for the first interrogation to finish (ACT_TERM).
+        connection.readRequestBuilder().addTagAddress("p", "1/100").build().execute()
+            .get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         station.sendEndOfInitialisation();
         awaitCondition(() -> countAsdus(TypeIdentification.INTERROGATION_COMMAND) == 2, "second interrogation");
+    }
+
+    @Test
+    void noSecondInterrogationWhileOneIsRunning() throws Exception {
+        // As FreyrSCADA does: M_EI_NA_1 right after connecting, before the GI is answered.
+        station.answerInterrogation(false);
+        connect(null);
+        awaitAsdu(TypeIdentification.INTERROGATION_COMMAND);
+        station.sendEndOfInitialisation();
+        Thread.sleep(500);
+        assertEquals(1, countAsdus(TypeIdentification.INTERROGATION_COMMAND));
     }
 
     @Test
