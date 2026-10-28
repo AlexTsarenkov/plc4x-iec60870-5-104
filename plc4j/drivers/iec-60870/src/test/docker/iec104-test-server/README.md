@@ -29,6 +29,18 @@ docker run --rm -p 2404:2404 iec104-test-server
 
 Connect with `iec-60870-5-104:tcp://localhost:2404`.
 
+Or with Docker Compose, attached to the existing external network `k8s_default`
+(create it first with `docker network create k8s_default` if it does not exist):
+
+```bash
+docker compose up -d --build
+docker compose logs -f
+```
+
+Containers in `k8s_default` connect with `iec-60870-5-104:tcp://iec104-test-server:2404`.
+For an own point list, copy `server.py` to `my_server.py` and uncomment the
+`volumes` lines in `docker-compose.yml`.
+
 ## Point list
 
 All points live in common address (CA) **1**.

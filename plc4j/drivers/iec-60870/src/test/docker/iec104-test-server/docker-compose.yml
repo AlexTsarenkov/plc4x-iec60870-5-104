@@ -1,0 +1,54 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+# IEC 60870-5-104 test server in the existing external network "k8s_default".
+#
+#   docker compose up -d --build     start (builds the image from the Dockerfile here)
+#   docker compose logs -f           every command received is logged
+#   docker compose down              stop
+#
+# Connection string:
+#   from a container in k8s_default:  iec-60870-5-104:tcp://iec104-test-server:2404
+#   from the host:                    iec-60870-5-104:tcp://localhost:2404
+#
+# The network must exist before "up": docker network create k8s_default
+
+services:
+  iec104-test-server:
+    build: .
+    image: iec104-test-server:latest
+    container_name: iec104-test-server
+    restart: unless-stopped
+    environment:
+      IEC104_PORT: "2404"
+      # Interval of the spontaneously changing point IOA 101, ms.
+      IEC104_SLOW_POINT_INTERVAL_MS: "30000"
+    ports:
+      # Host port 2404 may be taken by another simulator (FreyrSCADA): use "2405:2404" then.
+      - "2404:2404"
+    # Own point list without rebuilding the image: copy server.py to my_server.py,
+    # edit it, and uncomment these lines.
+    # volumes:
+    #   - ./my_server.py:/app/server.py:ro
+    networks:
+      - k8s_default
+
+networks:
+  k8s_default:
+    external: true
