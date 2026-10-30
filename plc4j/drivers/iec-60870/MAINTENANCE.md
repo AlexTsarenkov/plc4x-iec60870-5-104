@@ -177,13 +177,19 @@ docker run -d --rm -p 2404:2404 --name iec104-test-server iec104-test-server
 ```
 
 Результат: `plc4j/drivers/iec-60870/target/plc4j-driver-iec-60870-<версия>.jar` и он же в
-`~/.m2/repository/org/apache/plc4x/plc4j-driver-iec-60870/<версия>/`.
+`~/.m2/repository/com/eik/plc4x/plc4j-driver-iec-60870/<версия>/`.
 
 `-P with-java` обязателен: без него корневой pom не включает модули Java. Apache RAT
 проверяет лицензионный заголовок в каждом файле; все файлы форка его содержат. Если
 RAT мешает при экспериментах, добавьте `-Drat.skip=true`.
 
-### Версии
+### Координаты и версии
+
+У драйвера свой groupId, `com.eik.plc4x` (`<groupId>` в `pom.xml` драйвера): под ним он
+выкладывается в корпоративный Nexus. Родительский pom остаётся
+`org.apache.plc4x:plc4j-drivers:0.13.1`, Java-пакеты и `META-INF/services` не меняются.
+Модуль `protocols/iec-60870` остаётся в `org.apache.plc4x`: он не публикуется и нужен только
+при перегенерации кода.
 
 У модуля своя версия, `0.13.1-iec104.N` (`<version>` в `pom.xml` драйвера), чтобы сборку
 форка нельзя было спутать с официальным `0.13.1` из Maven Central. Родитель и
@@ -194,7 +200,7 @@ RAT мешает при экспериментах, добавьте `-Drat.skip
 | Версия | Что вошло |
 |---|---|
 | 0.13.1-iec104.1 | канальный уровень, GI, чтение, уставки и одиночная команда, SQ=1 |
-| 0.13.1-iec104.2 | все команды направления управления, SBO, ACT_TERM, `time-zone`, правки mspec, разбор M_DP/M_ST/M_BO/M_PS/M_EP |
+| 0.13.1-iec104.2 | все команды направления управления, SBO, ACT_TERM, `time-zone`, правки mspec, разбор M_DP/M_ST/M_BO/M_PS/M_EP; затем без смены версии: имя протокола `IEC 60870-5-104-LSP`, без повторного GI по M_EI во время опроса, groupId `com.eik.plc4x` |
 
 ### Тесты
 
@@ -320,8 +326,7 @@ Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)
 ```
 
 Суффикс `-LSP` есть только у драйвера форка. Если в логе `(IEC 60870-5-104)` без суффикса,
-в classpath оказался драйвер upstream (`org.apache.plc4x:plc4j-driver-iec-60870` без
-`-iec104.N` в версии): проверьте `mvn dependency:tree` и содержимое shade-jar.
+в classpath оказался драйвер upstream (`org.apache.plc4x:plc4j-driver-iec-60870`): проверьте `mvn dependency:tree` и содержимое shade-jar.
 
 Логи (SLF4J):
 

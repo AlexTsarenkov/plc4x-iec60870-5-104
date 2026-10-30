@@ -47,7 +47,7 @@
 
 ## Как подключить к своему проекту
 
-Драйвер публикуется как `org.apache.plc4x:plc4j-driver-iec-60870:0.13.1-iec104.2`. Он
+Драйвер публикуется как `com.eik.plc4x:plc4j-driver-iec-60870:0.13.1-iec104.2`. Он
 зависит от официальных `plc4j-api`, `plc4j-spi` и `plc4j-transport-tcp` версии 0.13.1 из
 Maven Central, они подтянутся сами.
 
@@ -56,16 +56,35 @@ Maven Central, они подтянутся сами.
 
 ```xml
 <dependency>
-  <groupId>org.apache.plc4x</groupId>
+  <groupId>com.eik.plc4x</groupId>
   <artifactId>plc4j-driver-iec-60870</artifactId>
   <version>0.13.1-iec104.2</version>
 </dependency>
 ```
 
-Официального `plc4j-driver-iec-60870:0.13.1` в проекте быть не должно, даже
-транзитивно (например, через `plc4j-drivers-all`): оба регистрируются под кодом
-`iec-60870-5-104`, и какой из них выберет `PlcDriverManager`, не определено. Проверка:
-`mvn dependency:tree -Dincludes=org.apache.plc4x:plc4j-driver-iec-60870`.
+groupId у форка свой (`com.eik.plc4x`), Java-пакеты и код подключения те же, что у PLC4X.
+
+Официального `org.apache.plc4x:plc4j-driver-iec-60870` в проекте быть не должно, даже
+транзитивно (например, через `plc4j-drivers-all`). Из-за разных groupId Maven считает их
+разными артефактами и положит в classpath оба; оба регистрируются под кодом
+`iec-60870-5-104`, и `DefaultPlcDriverManager` при создании падает с
+`Multiple driver implementations available for protocol code 'iec-60870-5-104'`.
+Проверка: `mvn dependency:tree -Dincludes=:plc4j-driver-iec-60870` должен показать только
+`com.eik.plc4x`. Официальный исключается так:
+
+```xml
+<dependency>
+  <groupId>org.apache.plc4x</groupId>
+  <artifactId>plc4j-drivers-all</artifactId>
+  <version>0.13.1</version>
+  <exclusions>
+    <exclusion>
+      <groupId>org.apache.plc4x</groupId>
+      <artifactId>plc4j-driver-iec-60870</artifactId>
+    </exclusion>
+  </exclusions>
+</dependency>
+```
 
 ### Публикация в корпоративный Nexus
 
@@ -88,12 +107,14 @@ Maven Central, они подтянутся сами.
 </servers>
 ```
 
-Выкладываются jar, sources jar, pom и kar (архив для Karaf, проекту он не нужен).
+Выкладываются jar, sources jar, pom и kar (архив для Karaf, проекту он не нужен), в
+`com/eik/plc4x/plc4j-driver-iec-60870/<версия>/`. Модуль `protocols/iec-60870` выкладывать
+не нужно: он нужен только для перегенерации кода из mspec.
 Родительские pom PLC4X 0.13.1 и `plc4j-api`/`plc4j-spi`/`plc4j-transport-tcp` выкладывать не
 нужно, если Nexus проксирует Maven Central (обычно так и есть).
 
 Release-репозиторий Nexus не даёт перезаписать версию. Для каждой новой сборки
-увеличивайте номер (`0.13.1-iec104.3`, ...), см. MAINTENANCE.md, «Версии».
+увеличивайте номер (`0.13.1-iec104.3`, ...), см. MAINTENANCE.md, «Координаты и версии».
 
 ### Сборка fat jar через maven-shade-plugin
 
