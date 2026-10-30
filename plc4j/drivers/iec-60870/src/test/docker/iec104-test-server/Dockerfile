@@ -25,7 +25,10 @@
 FROM python:3.12-slim
 
 # c104 ships binary wheels for linux x86_64 and aarch64, nothing to compile.
-RUN pip install --no-cache-dir "c104>=2,<3"
+# Pinned: the integration test depends on the server's behaviour, and c104 2.2.1
+# (new lib60870 connection defaults) broke it without any change on our side.
+# Raise the pin deliberately and check Iec608705104InteropIT.
+RUN pip install --no-cache-dir "c104==2.2.0"
 
 COPY server.py /app/server.py
 
