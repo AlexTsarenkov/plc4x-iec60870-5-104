@@ -1,0 +1,61 @@
+-------------------------------------------------------------------------------
+Test set: org.apache.plc4x.java.iec608705104.Iec608705104InteropIT
+-------------------------------------------------------------------------------
+Tests run: 8, Failures: 4, Errors: 1, Skipped: 0, Time elapsed: 53.98 s <<< FAILURE! -- in org.apache.plc4x.java.iec608705104.Iec608705104InteropIT
+org.apache.plc4x.java.iec608705104.Iec608705104InteropIT.readsWithReadCommand -- Time elapsed: 2.013 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <OK> but was: <REMOTE_ERROR>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1145)
+	at org.apache.plc4x.java.iec608705104.Iec608705104InteropIT.readsWithReadCommand(Iec608705104InteropIT.java:111)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+org.apache.plc4x.java.iec608705104.Iec608705104InteropIT.writesAllSupportedTypes -- Time elapsed: 4.061 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "org.apache.plc4x.java.api.value.PlcValue.getDouble()" because the return value of "org.apache.plc4x.java.api.messages.PlcReadResponse.getPlcValue(String)" is null
+	at org.apache.plc4x.java.iec608705104.Iec608705104InteropIT.writesAllSupportedTypes(Iec608705104InteropIT.java:156)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+org.apache.plc4x.java.iec608705104.Iec608705104InteropIT.doubleStepBitstringAndTimeTaggedCommands -- Time elapsed: 2.043 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: bits ==> expected: <OK> but was: <REMOTE_ERROR>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at org.apache.plc4x.java.iec608705104.Iec608705104InteropIT.doubleStepBitstringAndTimeTaggedCommands(Iec608705104InteropIT.java:194)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+org.apache.plc4x.java.iec608705104.Iec608705104InteropIT.selectBeforeOperate -- Time elapsed: 2.010 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <OK> but was: <REMOTE_ERROR>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1145)
+	at org.apache.plc4x.java.iec608705104.Iec608705104InteropIT.selectBeforeOperate(Iec608705104InteropIT.java:220)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+org.apache.plc4x.java.iec608705104.Iec608705104InteropIT.systemCommands -- Time elapsed: 2.008 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: clock synchronization ==> expected: <OK> but was: <REMOTE_ERROR>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at org.apache.plc4x.java.iec608705104.Iec608705104InteropIT.systemCommands(Iec608705104InteropIT.java:232)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+

@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: org.apache.plc4x.java.iec608705104.Iec608705104DriverTest
+-------------------------------------------------------------------------------
+Tests run: 25, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 54.19 s -- in org.apache.plc4x.java.iec608705104.Iec608705104DriverTest

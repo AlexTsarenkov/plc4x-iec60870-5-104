@@ -1,0 +1,15 @@
+IEC 60870-5-104 test server listening on 0.0.0.0:2404, CA=1
+spontaneous IOA=101 value=80.1500015258789
+spontaneous IOA=101 value=43.380001068115234
+spontaneous IOA=101 value=38.56999969482422
+spontaneous IOA=101 value=54.060001373291016
+command Type.C_SE_NC_1 IOA=300 value=33.25 -> IOA 100
+command Type.C_SE_NA_1 IOA=320 value=-0.250000 -> IOA 120
+command Type.C_SE_NB_1 IOA=310 value=-42 -> IOA 110
+command Type.C_SC_NA_1 IOA=400 value=True -> IOA 200
+command Type.C_SE_TC_1 IOA=301 value=2.25 -> IOA 100
+command Type.C_SC_TA_1 IOA=401 value=True -> IOA 200
+command Type.C_RC_NA_1 IOA=600 value=Step.HIGHER -> step position 1
+command Type.C_RC_NA_1 IOA=600 value=Step.HIGHER -> step position 2
+spontaneous IOA=101 value=63.75
+spontaneous IOA=101 value=58.40999984741211
