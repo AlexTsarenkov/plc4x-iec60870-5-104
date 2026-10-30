@@ -47,7 +47,7 @@
 
 ## Как подключить к своему проекту
 
-Драйвер публикуется как `com.eik.plc4x:plc4j-driver-iec-60870:0.13.1-iec104.2`. Он
+Драйвер публикуется как `com.labsp.plc4x:plc4j-driver-iec-60870:0.13.1-iec104.2`. Он
 зависит от официальных `plc4j-api`, `plc4j-spi` и `plc4j-transport-tcp` версии 0.13.1 из
 Maven Central, они подтянутся сами.
 
@@ -56,13 +56,13 @@ Maven Central, они подтянутся сами.
 
 ```xml
 <dependency>
-  <groupId>com.eik.plc4x</groupId>
+  <groupId>com.labsp.plc4x</groupId>
   <artifactId>plc4j-driver-iec-60870</artifactId>
   <version>0.13.1-iec104.2</version>
 </dependency>
 ```
 
-groupId у форка свой (`com.eik.plc4x`), Java-пакеты и код подключения те же, что у PLC4X.
+groupId у форка свой (`com.labsp.plc4x`), Java-пакеты и код подключения те же, что у PLC4X.
 
 Официального `org.apache.plc4x:plc4j-driver-iec-60870` в проекте быть не должно, даже
 транзитивно (например, через `plc4j-drivers-all`). Из-за разных groupId Maven считает их
@@ -70,7 +70,7 @@ groupId у форка свой (`com.eik.plc4x`), Java-пакеты и код п
 `iec-60870-5-104`, и `DefaultPlcDriverManager` при создании падает с
 `Multiple driver implementations available for protocol code 'iec-60870-5-104'`.
 Проверка: `mvn dependency:tree -Dincludes=:plc4j-driver-iec-60870` должен показать только
-`com.eik.plc4x`. Официальный исключается так:
+`com.labsp.plc4x`. Официальный исключается так:
 
 ```xml
 <dependency>
@@ -108,7 +108,7 @@ groupId у форка свой (`com.eik.plc4x`), Java-пакеты и код п
 ```
 
 Выкладываются jar, sources jar, pom и kar (архив для Karaf, проекту он не нужен), в
-`com/eik/plc4x/plc4j-driver-iec-60870/<версия>/`. Модуль `protocols/iec-60870` выкладывать
+`com/labsp/plc4x/plc4j-driver-iec-60870/<версия>/`. Модуль `protocols/iec-60870` выкладывать
 не нужно: он нужен только для перегенерации кода из mspec.
 Родительские pom PLC4X 0.13.1 и `plc4j-api`/`plc4j-spi`/`plc4j-transport-tcp` выкладывать не
 нужно, если Nexus проксирует Maven Central (обычно так и есть).

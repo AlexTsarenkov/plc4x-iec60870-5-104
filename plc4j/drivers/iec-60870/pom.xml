@@ -32,7 +32,7 @@
     Java packages and META-INF/services stay those of PLC4X: only the Maven coordinates
     differ. The parent (org.apache.plc4x:plc4j-drivers:0.13.1) is still the official one.
   -->
-  <groupId>com.eik.plc4x</groupId>
+  <groupId>com.labsp.plc4x</groupId>
   <artifactId>plc4j-driver-iec-60870</artifactId>
   <!--
     Fork: own version, so that this build can never be confused with the official
