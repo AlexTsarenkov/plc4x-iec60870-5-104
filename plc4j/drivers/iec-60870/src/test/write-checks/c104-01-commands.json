@@ -1,0 +1,47 @@
+[
+    {
+        "name": "Float",
+        "address": "1/300:C_SE_NC_1",
+        "value": 56.6
+    },
+    {
+        "name": "Float-Time",
+        "address": "1/301:C_SE_TC_1",
+        "value": 24.4
+    },
+    {
+        "name": "Scaled",
+        "address": "1/310:C_SE_NB_1",
+        "value": -42
+    },
+    {
+        "name": "Normalized",
+        "address": "1/320:C_SE_NA_1",
+        "value": 0.25
+    },
+    {
+        "name": "Single",
+        "address": "1/400:C_SC_NA_1",
+        "value": true
+    },
+    {
+        "name": "Single-Time",
+        "address": "1/401:C_SC_TA_1",
+        "value": true
+    },
+    {
+        "name": "Double",
+        "address": "1/500:C_DC_NA_1",
+        "value": "ON"
+    },
+    {
+        "name": "Step-Up-2",
+        "address": "1/600:C_RC_NA_1",
+        "value": 2
+    },
+    {
+        "name": "Bitstring",
+        "address": "1/700:C_BO_NA_1",
+        "value": 255
+    }
+]

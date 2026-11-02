@@ -1,0 +1,37 @@
+[
+    {
+        "name": "Control-OK",
+        "address": "1/300:C_SE_NC_1",
+        "value": 12.5
+    },
+    {
+        "name": "Always-Rejected",
+        "address": "1/399:C_SE_NC_1",
+        "value": 1.0
+    },
+    {
+        "name": "SBO-Point-Direct",
+        "address": "1/302:C_SE_NC_1",
+        "value": 1.0
+    },
+    {
+        "name": "Unknown-IOA",
+        "address": "1/9999:C_SE_NC_1",
+        "value": 1.0
+    },
+    {
+        "name": "Double-Number",
+        "address": "1/500:C_DC_NA_1",
+        "value": 1
+    },
+    {
+        "name": "Step-Zero",
+        "address": "1/600:C_RC_NA_1",
+        "value": 0
+    },
+    {
+        "name": "Normalized-Too-Big",
+        "address": "1/320:C_SE_NA_1",
+        "value": 1.5
+    }
+]
