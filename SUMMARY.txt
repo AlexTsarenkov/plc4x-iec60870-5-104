@@ -1,0 +1,5 @@
+sha:      d958f2da3d59cdf66fa7b7d29fd44e41d56dbc4a
+ref:      refs/heads/iec104-read-write
+run:      https://github.com/AlexTsarenkov/plc4x-iec60870-5-104/actions/runs/41453141186
+job:      failure
+finished: 2026-11-02T13:31:41Z

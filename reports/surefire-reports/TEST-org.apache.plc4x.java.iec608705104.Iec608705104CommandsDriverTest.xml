@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest" time="51.076" tests="24" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="17"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.class.path" value="/home/runner/work/plc4x-iec60870-5-104/plc4x-iec60870-5-104/plc4j/drivers/iec-60870/target/test-classes:/home/runner/work/plc4x-iec60870-5-104/plc4x-iec60870-5-104/plc4j/drivers/iec-60870/target/classes:/home/runner/.m2/repository/org/apache/plc4x/plc4j-api/0.13.1/plc4j-api-0.13.1.jar:/home/runner/.m2/repository/org/apache/plc4x/plc4j-spi/0.13.1/plc4j-spi-0.13.1.jar:/home/runner/.m2/repository/io/netty/netty-codec/4.1.123.Final/netty-codec-4.1.123.Final.jar:/home/runner/.m2/repository/com/fasterxml/woodstox/woodstox-core/7.1.1/woodstox-core-7.1.1.jar:/home/runner/.m2/repository/org/codehaus/woodstox/stax2-api/4.2.2/stax2-api-4.2.2.jar:/home/runner/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.19.2/jackson-databind-2.19.2.jar:/home/runner/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.19.2/jackson-annotations-2.19.2.jar:/home/runner/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.19.2/jackson-core-2.19.2.jar:/home/runner/.m2/repository/io/vavr/vavr/0.10.7/vavr-0.10.7.jar:/home/runner/.m2/repository/io/vavr/vavr-match/0.10.7/vavr-match-0.10.7.jar:/home/runner/.m2/repository/com/github/jinahya/bit-io/1.4.3/bit-io-1.4.3.jar:/home/runner/.m2/repository/org/apache/plc4x/plc4j-transport-tcp/0.13.1/plc4j-transport-tcp-0.13.1.jar:/home/runner/.m2/repository/io/netty/netty-buffer/4.1.123.Final/netty-buffer-4.1.123.Final.jar:/home/runner/.m2/repository/io/netty/netty-transport/4.1.123.Final/netty-transport-4.1.123.Final.jar:/home/runner/.m2/repository/io/netty/netty-resolver/4.1.123.Final/netty-resolver-4.1.123.Final.jar:/home/runner/.m2/repository/io/netty/netty-common/4.1.123.Final/netty-common-4.1.123.Final.jar:/home/runner/.m2/repository/org/apache/commons/commons-lang3/3.18.0/commons-lang3-3.18.0.jar:/home/runner/.m2/repository/org/apache/plc4x/plc4j-utils-test-utils/0.13.1/plc4j-utils-test-utils-0.13.1.jar:/home/runner/.m2/repository/org/apache/plc4x/plc4j-transport-test/0.13.1/plc4j-transport-test-0.13.1.jar:/home/runner/.m2/repository/commons-io/commons-io/2.20.0/commons-io-2.20.0.jar:/home/runner/.m2/repository/org/apache/maven/maven-artifact/3.9.11/maven-artifact-3.9.11.jar:/home/runner/.m2/repository/org/pcap4j/pcap4j-core/1.8.2/pcap4j-core-1.8.2.jar:/home/runner/.m2/repository/net/java/dev/jna/jna/5.17.0/jna-5.17.0.jar:/home/runner/.m2/repository/org/dom4j/dom4j/2.2.0/dom4j-2.2.0.jar:/home/runner/.m2/repository/org/xmlunit/xmlunit-core/2.10.3/xmlunit-core-2.10.3.jar:/home/runner/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/2.3.3/jakarta.xml.bind-api-2.3.3.jar:/home/runner/.m2/repository/jakarta/activation/jakarta.activation-api/1.2.2/jakarta.activation-api-1.2.2.jar:/home/runner/.m2/repository/commons-codec/commons-codec/1.19.0/commons-codec-1.19.0.jar:/home/runner/.m2/repository/org/apache/plc4x/plc4x-protocols-iec-60870/0.13.1/plc4x-protocols-iec-60870-0.13.1-tests.jar:/home/runner/.m2/repository/org/apache/plc4x/plc4x-code-generation-protocol-base-mspec/0.13.1/plc4x-code-generation-protocol-base-mspec-0.13.1.jar:/home/runner/.m2/repository/org/apache/plc4x/plugins/plc4x-code-generation-protocol-base/1.8.0/plc4x-code-generation-protocol-base-1.8.0.jar:/home/runner/.m2/repository/org/apache/plc4x/plugins/plc4x-code-generation-types-base/1.8.0/plc4x-code-generation-types-base-1.8.0.jar:/home/runner/.m2/repository/org/antlr/antlr4-runtime/4.13.2/antlr4-runtime-4.13.2.jar:/home/runner/.m2/repository/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar:/home/runner/.m2/repository/ch/qos/logback/logback-classic/1.5.18/logback-classic-1.5.18.jar:/home/runner/.m2/repository/ch/qos/logback/logback-core/1.5.18/logback-core-1.5.18.jar:/home/runner/.m2/repository/org/junit/platform/junit-platform-launcher/1.13.4/junit-platform-launcher-1.13.4.jar:/home/runner/.m2/repository/org/junit/platform/junit-platform-engine/1.13.4/junit-platform-engine-1.13.4.jar:/home/runner/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter/5.13.4/junit-jupiter-5.13.4.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.13.4/junit-jupiter-engine-5.13.4.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.13.4/junit-jupiter-api-5.13.4.jar:/home/runner/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/runner/.m2/repository/org/junit/platform/junit-platform-commons/1.13.4/junit-platform-commons-1.13.4.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.13.4/junit-jupiter-params-5.13.4.jar:/home/runner/.m2/repository/org/hamcrest/hamcrest/3.0/hamcrest-3.0.jar:/home/runner/.m2/repository/org/hamcrest/hamcrest-core/3.0/hamcrest-core-3.0.jar:/home/runner/.m2/repository/org/hamcrest/hamcrest-library/3.0/hamcrest-library-3.0.jar:/home/runner/.m2/repository/org/mockito/mockito-core/5.19.0/mockito-core-5.19.0.jar:/home/runner/.m2/repository/net/bytebuddy/byte-buddy/1.17.7/byte-buddy-1.17.7.jar:/home/runner/.m2/repository/net/bytebuddy/byte-buddy-agent/1.17.6/byte-buddy-agent-1.17.6.jar:/home/runner/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/runner/.m2/repository/org/mockito/mockito-junit-jupiter/5.19.0/mockito-junit-jupiter-5.19.0.jar:/home/runner/.m2/repository/org/assertj/assertj-core/3.27.4/assertj-core-3.27.4.jar:/home/runner/.m2/repository/org/apache/groovy/groovy-test-junit5/4.0.28/groovy-test-junit5-4.0.28.jar:/home/runner/.m2/repository/org/apache/groovy/groovy/4.0.28/groovy-4.0.28.jar:/home/runner/work/plc4x-iec60870-5-104/plc4x-iec60870-5-104/plc4j/drivers/iec-60870/target/gradle-enterprise/test-listeners.jar:"/>
+    <property name="java.vm.vendor" value="Eclipse Adoptium"/>
+    <property name="maven.javadoc.skip" value="true"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.vendor.url" value="https://adoptium.net/"/>
+    <property name="user.timezone" value="Etc/UTC"/>
+    <property name="os.name" value="Linux"/>
+    <property name="java.vm.specification.version" value="17"/>
+    <property name="rat.skip" value="true"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.boot.library.path" value="/usr/lib/jvm/temurin-17-jdk-amd64/lib"/>
+    <property name="sun.java.command" value="/home/runner/work/plc4x-iec60870-5-104/plc4x-iec60870-5-104/plc4j/drivers/iec-60870/target/surefire/surefirebooter-20261102132855329_3.jar /home/runner/work/plc4x-iec60870-5-104/plc4x-iec60870-5-104/plc4j/drivers/iec-60870/target/surefire 2026-11-02T13-28-55_041-jvmRun1 surefire-20261102132855329_1tmp surefire_0-20261102132855329_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="/home/runner/work/plc4x-iec60870-5-104/plc4x-iec60870-5-104/plc4j/drivers/iec-60870/target/test-classes:/home/runner/work/plc4x-iec60870-5-104/plc4x-iec60870-5-104/plc4j/drivers/iec-60870/target/classes:/home/runner/.m2/repository/org/apache/plc4x/plc4j-api/0.13.1/plc4j-api-0.13.1.jar:/home/runner/.m2/repository/org/apache/plc4x/plc4j-spi/0.13.1/plc4j-spi-0.13.1.jar:/home/runner/.m2/repository/io/netty/netty-codec/4.1.123.Final/netty-codec-4.1.123.Final.jar:/home/runner/.m2/repository/com/fasterxml/woodstox/woodstox-core/7.1.1/woodstox-core-7.1.1.jar:/home/runner/.m2/repository/org/codehaus/woodstox/stax2-api/4.2.2/stax2-api-4.2.2.jar:/home/runner/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.19.2/jackson-databind-2.19.2.jar:/home/runner/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.19.2/jackson-annotations-2.19.2.jar:/home/runner/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.19.2/jackson-core-2.19.2.jar:/home/runner/.m2/repository/io/vavr/vavr/0.10.7/vavr-0.10.7.jar:/home/runner/.m2/repository/io/vavr/vavr-match/0.10.7/vavr-match-0.10.7.jar:/home/runner/.m2/repository/com/github/jinahya/bit-io/1.4.3/bit-io-1.4.3.jar:/home/runner/.m2/repository/org/apache/plc4x/plc4j-transport-tcp/0.13.1/plc4j-transport-tcp-0.13.1.jar:/home/runner/.m2/repository/io/netty/netty-buffer/4.1.123.Final/netty-buffer-4.1.123.Final.jar:/home/runner/.m2/repository/io/netty/netty-transport/4.1.123.Final/netty-transport-4.1.123.Final.jar:/home/runner/.m2/repository/io/netty/netty-resolver/4.1.123.Final/netty-resolver-4.1.123.Final.jar:/home/runner/.m2/repository/io/netty/netty-common/4.1.123.Final/netty-common-4.1.123.Final.jar:/home/runner/.m2/repository/org/apache/commons/commons-lang3/3.18.0/commons-lang3-3.18.0.jar:/home/runner/.m2/repository/org/apache/plc4x/plc4j-utils-test-utils/0.13.1/plc4j-utils-test-utils-0.13.1.jar:/home/runner/.m2/repository/org/apache/plc4x/plc4j-transport-test/0.13.1/plc4j-transport-test-0.13.1.jar:/home/runner/.m2/repository/commons-io/commons-io/2.20.0/commons-io-2.20.0.jar:/home/runner/.m2/repository/org/apache/maven/maven-artifact/3.9.11/maven-artifact-3.9.11.jar:/home/runner/.m2/repository/org/pcap4j/pcap4j-core/1.8.2/pcap4j-core-1.8.2.jar:/home/runner/.m2/repository/net/java/dev/jna/jna/5.17.0/jna-5.17.0.jar:/home/runner/.m2/repository/org/dom4j/dom4j/2.2.0/dom4j-2.2.0.jar:/home/runner/.m2/repository/org/xmlunit/xmlunit-core/2.10.3/xmlunit-core-2.10.3.jar:/home/runner/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/2.3.3/jakarta.xml.bind-api-2.3.3.jar:/home/runner/.m2/repository/jakarta/activation/jakarta.activation-api/1.2.2/jakarta.activation-api-1.2.2.jar:/home/runner/.m2/repository/commons-codec/commons-codec/1.19.0/commons-codec-1.19.0.jar:/home/runner/.m2/repository/org/apache/plc4x/plc4x-protocols-iec-60870/0.13.1/plc4x-protocols-iec-60870-0.13.1-tests.jar:/home/runner/.m2/repository/org/apache/plc4x/plc4x-code-generation-protocol-base-mspec/0.13.1/plc4x-code-generation-protocol-base-mspec-0.13.1.jar:/home/runner/.m2/repository/org/apache/plc4x/plugins/plc4x-code-generation-protocol-base/1.8.0/plc4x-code-generation-protocol-base-1.8.0.jar:/home/runner/.m2/repository/org/apache/plc4x/plugins/plc4x-code-generation-types-base/1.8.0/plc4x-code-generation-types-base-1.8.0.jar:/home/runner/.m2/repository/org/antlr/antlr4-runtime/4.13.2/antlr4-runtime-4.13.2.jar:/home/runner/.m2/repository/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar:/home/runner/.m2/repository/ch/qos/logback/logback-classic/1.5.18/logback-classic-1.5.18.jar:/home/runner/.m2/repository/ch/qos/logback/logback-core/1.5.18/logback-core-1.5.18.jar:/home/runner/.m2/repository/org/junit/platform/junit-platform-launcher/1.13.4/junit-platform-launcher-1.13.4.jar:/home/runner/.m2/repository/org/junit/platform/junit-platform-engine/1.13.4/junit-platform-engine-1.13.4.jar:/home/runner/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter/5.13.4/junit-jupiter-5.13.4.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.13.4/junit-jupiter-engine-5.13.4.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.13.4/junit-jupiter-api-5.13.4.jar:/home/runner/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/runner/.m2/repository/org/junit/platform/junit-platform-commons/1.13.4/junit-platform-commons-1.13.4.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.13.4/junit-jupiter-params-5.13.4.jar:/home/runner/.m2/repository/org/hamcrest/hamcrest/3.0/hamcrest-3.0.jar:/home/runner/.m2/repository/org/hamcrest/hamcrest-core/3.0/hamcrest-core-3.0.jar:/home/runner/.m2/repository/org/hamcrest/hamcrest-library/3.0/hamcrest-library-3.0.jar:/home/runner/.m2/repository/org/mockito/mockito-core/5.19.0/mockito-core-5.19.0.jar:/home/runner/.m2/repository/net/bytebuddy/byte-buddy/1.17.7/byte-buddy-1.17.7.jar:/home/runner/.m2/repository/net/bytebuddy/byte-buddy-agent/1.17.6/byte-buddy-agent-1.17.6.jar:/home/runner/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/runner/.m2/repository/org/mockito/mockito-junit-jupiter/5.19.0/mockito-junit-jupiter-5.19.0.jar:/home/runner/.m2/repository/org/assertj/assertj-core/3.27.4/assertj-core-3.27.4.jar:/home/runner/.m2/repository/org/apache/groovy/groovy-test-junit5/4.0.28/groovy-test-junit5-4.0.28.jar:/home/runner/.m2/repository/org/apache/groovy/groovy/4.0.28/groovy-4.0.28.jar:/home/runner/work/plc4x-iec60870-5-104/plc4x-iec60870-5-104/plc4j/drivers/iec-60870/target/gradle-enterprise/test-listeners.jar:"/>
+    <property name="iec104.it.port" value="2404"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="/home/runner"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2026-10-20"/>
+    <property name="java.home" value="/usr/lib/jvm/temurin-17-jdk-amd64"/>
+    <property name="file.separator" value="/"/>
+    <property name="basedir" value="/home/runner/work/plc4x-iec60870-5-104/plc4x-iec60870-5-104/plc4j/drivers/iec-60870"/>
+    <property name="java.vm.compressedOopsMode" value="32-bit"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="iec104.it.host" value="127.0.0.1"/>
+    <property name="surefire.real.class.path" value="/home/runner/work/plc4x-iec60870-5-104/plc4x-iec60870-5-104/plc4j/drivers/iec-60870/target/surefire/surefirebooter-20261102132855329_3.jar"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="17.0.21+9"/>
+    <property name="user.name" value="runner"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="7.0.0-1017-azure"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="com.gradle.maven.scan.extension.test.listener.junitplatform.NestedExecutionSafeDelegatingTestExecutionListener" value="3c9bfddc"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="java.vendor.version" value="Temurin-17.0.21+9"/>
+    <property name="develocity.listener.surefire.forkId" value="1"/>
+    <property name="localRepository" value="/home/runner/.m2/repository"/>
+    <property name="java.vendor.url.bug" value="https://github.com/adoptium/adoptium-support/issues"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="java.version" value="17.0.21"/>
+    <property name="user.dir" value="/home/runner/work/plc4x-iec60870-5-104/plc4x-iec60870-5-104/plc4j/drivers/iec-60870"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="native.encoding" value="UTF-8"/>
+    <property name="spotbugs.skip" value="true"/>
+    <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib"/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="java.vendor" value="Eclipse Adoptium"/>
+    <property name="java.vm.version" value="17.0.21+9"/>
+    <property name="java.specification.maintenance.version" value="1"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="develocity.listener.port" value="44429"/>
+    <property name="java.class.version" value="61.0"/>
+  </properties>
+  <testcase name="parameterActivationAndDeactivation" classname="org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest" time="2.086">
+    <system-out><![CDATA[13:29:53.743 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Instantiating new PLC Driver Manager with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+13:29:53.743 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering available drivers...
+13:29:53.743 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)
+13:29:53.745 [main] INFO  o.a.p.j.t.tcp.TcpChannelFactory - Configuring Bootstrap with org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014TcpTransportConfiguration@486ab192
+13:29:53.749 [nioEventLoopGroup-27-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 data transfer started with Iec608705014Configuration{requestTimeout=4000, t1=15000, t2=10000, t3=20000, k=12, w=8, generalInterrogation=true, interrogationAsduAddress=65535, interrogationTimeout=30000, readMode=cache, selectBeforeOperate=false, waitForTermination=false, terminationTimeout=30000, timeZone=UTC, originatorAddress=0}
+13:29:53.749 [nioEventLoopGroup-27-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Sending general interrogation to 65535
+13:29:53.762 [nioEventLoopGroup-27-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 confirmed
+13:29:53.766 [nioEventLoopGroup-27-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer CONFIRMATION_ACTIVATION_ACTCON for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:29:53.773 [nioEventLoopGroup-27-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 finished, 10 values cached
+13:29:53.773 [nioEventLoopGroup-27-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:29:53.826 [nioEventLoopGroup-27-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 connection closed
+13:29:53.826 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Channel is closed, closing worker Group also
+13:29:55.827 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Worker Group was closed successfully!
+]]></system-out>
+  </testcase>
+  <testcase name="commandToUnknownStationIsNotFound" classname="org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest" time="2.053">
+    <system-out><![CDATA[13:29:55.829 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Instantiating new PLC Driver Manager with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+13:29:55.829 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering available drivers...
+13:29:55.830 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)
+13:29:55.831 [main] INFO  o.a.p.j.t.tcp.TcpChannelFactory - Configuring Bootstrap with org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014TcpTransportConfiguration@1a4dd83f
+13:29:55.833 [nioEventLoopGroup-28-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 data transfer started with Iec608705014Configuration{requestTimeout=4000, t1=15000, t2=10000, t3=20000, k=12, w=8, generalInterrogation=true, interrogationAsduAddress=65535, interrogationTimeout=30000, readMode=cache, selectBeforeOperate=false, waitForTermination=false, terminationTimeout=30000, timeZone=UTC, originatorAddress=0}
+13:29:55.833 [nioEventLoopGroup-28-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Sending general interrogation to 65535
+13:29:55.835 [nioEventLoopGroup-28-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 confirmed
+13:29:55.835 [nioEventLoopGroup-28-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer CONFIRMATION_ACTIVATION_ACTCON for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:29:55.878 [nioEventLoopGroup-28-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 finished, 10 values cached
+13:29:55.879 [nioEventLoopGroup-28-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:29:55.879 [nioEventLoopGroup-28-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Station refused the command to 7/300: cause ASDU_ADDRESS_UNKNOWN_UNKNOWN_ASDU_ADDRESS, negative true
+13:29:55.879 [nioEventLoopGroup-28-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 connection closed
+13:29:55.880 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Channel is closed, closing worker Group also
+13:29:57.880 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Worker Group was closed successfully!
+]]></system-out>
+  </testcase>
+  <testcase name="selectBeforeOperateAsConnectionDefault" classname="org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest" time="2.181">
+    <system-out><![CDATA[13:29:57.882 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Instantiating new PLC Driver Manager with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+13:29:57.882 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering available drivers...
+13:29:57.883 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)
+13:29:57.884 [main] INFO  o.a.p.j.t.tcp.TcpChannelFactory - Configuring Bootstrap with org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014TcpTransportConfiguration@88edd90
+13:29:57.889 [nioEventLoopGroup-29-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 data transfer started with Iec608705014Configuration{requestTimeout=4000, t1=15000, t2=10000, t3=20000, k=12, w=8, generalInterrogation=true, interrogationAsduAddress=65535, interrogationTimeout=30000, readMode=cache, selectBeforeOperate=true, waitForTermination=false, terminationTimeout=30000, timeZone=UTC, originatorAddress=0}
+13:29:57.890 [nioEventLoopGroup-29-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Sending general interrogation to 65535
+13:29:57.891 [nioEventLoopGroup-29-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 confirmed
+13:29:57.891 [nioEventLoopGroup-29-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer CONFIRMATION_ACTIVATION_ACTCON for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:29:57.934 [nioEventLoopGroup-29-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 finished, 10 values cached
+13:29:57.934 [nioEventLoopGroup-29-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:29:57.976 [nioEventLoopGroup-29-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=SINGLE_COMMAND, asduAddress=1, objectAddress=410]
+13:29:58.018 [nioEventLoopGroup-29-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Station refused the command to 1/410:C_SC_NA_1,direct: cause CONFIRMATION_ACTIVATION_ACTCON, negative true
+13:29:58.060 [nioEventLoopGroup-29-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=BITSTRING_32_BIT_COMMAND, asduAddress=1, objectAddress=700]
+13:29:58.061 [nioEventLoopGroup-29-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 connection closed
+13:29:58.061 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Channel is closed, closing worker Group also
+13:30:00.062 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Worker Group was closed successfully!
+]]></system-out>
+  </testcase>
+  <testcase name="timeTaggedCommandCarriesTheCurrentTime" classname="org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest" time="2.094">
+    <system-out><![CDATA[13:30:00.064 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Instantiating new PLC Driver Manager with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+13:30:00.064 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering available drivers...
+13:30:00.065 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)
+13:30:00.066 [main] INFO  o.a.p.j.t.tcp.TcpChannelFactory - Configuring Bootstrap with org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014TcpTransportConfiguration@70fbab13
+13:30:00.068 [nioEventLoopGroup-30-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 data transfer started with Iec608705014Configuration{requestTimeout=4000, t1=15000, t2=10000, t3=20000, k=12, w=8, generalInterrogation=true, interrogationAsduAddress=65535, interrogationTimeout=30000, readMode=cache, selectBeforeOperate=false, waitForTermination=false, terminationTimeout=30000, timeZone=UTC, originatorAddress=0}
+13:30:00.068 [nioEventLoopGroup-30-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Sending general interrogation to 65535
+13:30:00.070 [nioEventLoopGroup-30-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 confirmed
+13:30:00.070 [nioEventLoopGroup-30-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer CONFIRMATION_ACTIVATION_ACTCON for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:00.111 [nioEventLoopGroup-30-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 finished, 10 values cached
+13:30:00.111 [nioEventLoopGroup-30-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:00.112 [nioEventLoopGroup-30-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=MEASURED_VALUE_SHORT_FLOATING_POINT_NUMBER_COMMAND_WITH_TIME_TAG_CP56TIME2A, asduAddress=1, objectAddress=300]
+13:30:00.155 [nioEventLoopGroup-30-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=SINGLE_COMMAND_WITH_TIME_TAG_CP56TIME2A, asduAddress=1, objectAddress=400]
+13:30:00.156 [nioEventLoopGroup-30-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 connection closed
+13:30:00.156 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Channel is closed, closing worker Group also
+13:30:02.156 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Worker Group was closed successfully!
+]]></system-out>
+  </testcase>
+  <testcase name="wrongZoneShiftsTheTimeTag" classname="org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest" time="2.051">
+    <system-out><![CDATA[13:30:02.158 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Instantiating new PLC Driver Manager with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+13:30:02.159 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering available drivers...
+13:30:02.159 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)
+13:30:02.160 [main] INFO  o.a.p.j.t.tcp.TcpChannelFactory - Configuring Bootstrap with org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014TcpTransportConfiguration@1145d71f
+13:30:02.163 [nioEventLoopGroup-31-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 data transfer started with Iec608705014Configuration{requestTimeout=4000, t1=15000, t2=10000, t3=20000, k=12, w=8, generalInterrogation=true, interrogationAsduAddress=65535, interrogationTimeout=30000, readMode=cache, selectBeforeOperate=false, waitForTermination=false, terminationTimeout=30000, timeZone=UTC, originatorAddress=0}
+13:30:02.163 [nioEventLoopGroup-31-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Sending general interrogation to 65535
+13:30:02.205 [nioEventLoopGroup-31-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 confirmed
+13:30:02.206 [nioEventLoopGroup-31-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer CONFIRMATION_ACTIVATION_ACTCON for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:02.206 [nioEventLoopGroup-31-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 finished, 10 values cached
+13:30:02.206 [nioEventLoopGroup-31-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:02.207 [nioEventLoopGroup-31-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 connection closed
+13:30:02.207 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Channel is closed, closing worker Group also
+13:30:04.207 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Worker Group was closed successfully!
+]]></system-out>
+  </testcase>
+  <testcase name="bitstringCommand" classname="org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest" time="2.01">
+    <system-out><![CDATA[13:30:04.209 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Instantiating new PLC Driver Manager with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+13:30:04.209 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering available drivers...
+13:30:04.210 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)
+13:30:04.211 [main] INFO  o.a.p.j.t.tcp.TcpChannelFactory - Configuring Bootstrap with org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014TcpTransportConfiguration@4d21ca52
+13:30:04.213 [nioEventLoopGroup-32-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 data transfer started with Iec608705014Configuration{requestTimeout=4000, t1=15000, t2=10000, t3=20000, k=12, w=8, generalInterrogation=true, interrogationAsduAddress=65535, interrogationTimeout=30000, readMode=cache, selectBeforeOperate=false, waitForTermination=true, terminationTimeout=30000, timeZone=UTC, originatorAddress=0}
+13:30:04.213 [nioEventLoopGroup-32-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Sending general interrogation to 65535
+13:30:04.215 [nioEventLoopGroup-32-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 confirmed
+13:30:04.215 [nioEventLoopGroup-32-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer CONFIRMATION_ACTIVATION_ACTCON for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:04.216 [nioEventLoopGroup-32-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 finished, 10 values cached
+13:30:04.216 [nioEventLoopGroup-32-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:04.217 [nioEventLoopGroup-32-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 connection closed
+13:30:04.217 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Channel is closed, closing worker Group also
+13:30:06.217 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Worker Group was closed successfully!
+]]></system-out>
+  </testcase>
+  <testcase name="stepCommandRejectsZeroAndTooManySteps" classname="org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest" time="2.008">
+    <system-out><![CDATA[13:30:06.219 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Instantiating new PLC Driver Manager with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+13:30:06.219 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering available drivers...
+13:30:06.220 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)
+13:30:06.221 [main] INFO  o.a.p.j.t.tcp.TcpChannelFactory - Configuring Bootstrap with org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014TcpTransportConfiguration@50fc62e0
+13:30:06.223 [nioEventLoopGroup-33-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 data transfer started with Iec608705014Configuration{requestTimeout=4000, t1=15000, t2=10000, t3=20000, k=12, w=8, generalInterrogation=true, interrogationAsduAddress=65535, interrogationTimeout=30000, readMode=cache, selectBeforeOperate=false, waitForTermination=false, terminationTimeout=30000, timeZone=UTC, originatorAddress=0}
+13:30:06.223 [nioEventLoopGroup-33-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Sending general interrogation to 65535
+13:30:06.223 [main] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Cannot write 0 to 1/600:C_RC_NA_1: number of steps must not be 0
+13:30:06.224 [main] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Cannot write 65 to 1/600:C_RC_NA_1: number of steps must be a whole number in -64..64, was 65
+13:30:06.224 [nioEventLoopGroup-33-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 connection closed
+13:30:06.225 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Channel is closed, closing worker Group also
+13:30:08.225 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Worker Group was closed successfully!
+]]></system-out>
+  </testcase>
+  <testcase name="groupAndBroadcastInterrogation" classname="org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest" time="2.092">
+    <system-out><![CDATA[13:30:08.227 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Instantiating new PLC Driver Manager with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+13:30:08.227 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering available drivers...
+13:30:08.228 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)
+13:30:08.229 [main] INFO  o.a.p.j.t.tcp.TcpChannelFactory - Configuring Bootstrap with org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014TcpTransportConfiguration@1f0bf0d0
+13:30:08.231 [nioEventLoopGroup-34-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 data transfer started with Iec608705014Configuration{requestTimeout=4000, t1=15000, t2=10000, t3=20000, k=12, w=8, generalInterrogation=false, interrogationAsduAddress=65535, interrogationTimeout=30000, readMode=cache, selectBeforeOperate=false, waitForTermination=true, terminationTimeout=30000, timeZone=UTC, originatorAddress=0}
+13:30:08.273 [nioEventLoopGroup-34-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 confirmed
+13:30:08.274 [nioEventLoopGroup-34-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 finished, 10 values cached
+13:30:08.316 [nioEventLoopGroup-34-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 confirmed
+13:30:08.317 [nioEventLoopGroup-34-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 finished, 10 values cached
+13:30:08.317 [nioEventLoopGroup-34-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 connection closed
+13:30:08.318 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Channel is closed, closing worker Group also
+13:30:10.318 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Worker Group was closed successfully!
+]]></system-out>
+  </testcase>
+  <testcase name="refusedSelectIsNotFollowedByAnExecute" classname="org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest" time="2.049">
+    <system-out><![CDATA[13:30:10.320 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Instantiating new PLC Driver Manager with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+13:30:10.320 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering available drivers...
+13:30:10.320 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)
+13:30:10.321 [main] INFO  o.a.p.j.t.tcp.TcpChannelFactory - Configuring Bootstrap with org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014TcpTransportConfiguration@6cf782b6
+13:30:10.323 [nioEventLoopGroup-35-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 data transfer started with Iec608705014Configuration{requestTimeout=4000, t1=15000, t2=10000, t3=20000, k=12, w=8, generalInterrogation=true, interrogationAsduAddress=65535, interrogationTimeout=30000, readMode=cache, selectBeforeOperate=false, waitForTermination=false, terminationTimeout=30000, timeZone=UTC, originatorAddress=0}
+13:30:10.323 [nioEventLoopGroup-35-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Sending general interrogation to 65535
+13:30:10.324 [nioEventLoopGroup-35-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 confirmed
+13:30:10.324 [nioEventLoopGroup-35-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer CONFIRMATION_ACTIVATION_ACTCON for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:10.366 [nioEventLoopGroup-35-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 finished, 10 values cached
+13:30:10.366 [nioEventLoopGroup-35-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:10.366 [nioEventLoopGroup-35-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Station refused the select of 1/400:C_SC_NA_1,sbo: cause CONFIRMATION_ACTIVATION_ACTCON, negative true
+13:30:10.367 [nioEventLoopGroup-35-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 connection closed
+13:30:10.367 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Channel is closed, closing worker Group also
+13:30:12.367 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Worker Group was closed successfully!
+]]></system-out>
+  </testcase>
+  <testcase name="resetProcessAndDelayAcquisition" classname="org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest" time="2.094">
+    <system-out><![CDATA[13:30:12.371 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Instantiating new PLC Driver Manager with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+13:30:12.371 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering available drivers...
+13:30:12.372 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)
+13:30:12.372 [main] INFO  o.a.p.j.t.tcp.TcpChannelFactory - Configuring Bootstrap with org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014TcpTransportConfiguration@3fc8a6c0
+13:30:12.375 [nioEventLoopGroup-36-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 data transfer started with Iec608705014Configuration{requestTimeout=4000, t1=15000, t2=10000, t3=20000, k=12, w=8, generalInterrogation=true, interrogationAsduAddress=65535, interrogationTimeout=30000, readMode=cache, selectBeforeOperate=false, waitForTermination=false, terminationTimeout=30000, timeZone=UTC, originatorAddress=0}
+13:30:12.375 [nioEventLoopGroup-36-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Sending general interrogation to 65535
+13:30:12.377 [nioEventLoopGroup-36-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 confirmed
+13:30:12.377 [nioEventLoopGroup-36-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer CONFIRMATION_ACTIVATION_ACTCON for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:12.377 [nioEventLoopGroup-36-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 finished, 10 values cached
+13:30:12.377 [nioEventLoopGroup-36-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:12.461 [nioEventLoopGroup-36-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 connection closed
+13:30:12.461 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Channel is closed, closing worker Group also
+13:30:14.462 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Worker Group was closed successfully!
+]]></system-out>
+  </testcase>
+  <testcase name="testCommandsCountTheirSequence" classname="org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest" time="2.134">
+    <system-out><![CDATA[13:30:14.464 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Instantiating new PLC Driver Manager with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+13:30:14.464 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering available drivers...
+13:30:14.464 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)
+13:30:14.465 [main] INFO  o.a.p.j.t.tcp.TcpChannelFactory - Configuring Bootstrap with org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014TcpTransportConfiguration@6fd33f5a
+13:30:14.467 [nioEventLoopGroup-37-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 data transfer started with Iec608705014Configuration{requestTimeout=4000, t1=15000, t2=10000, t3=20000, k=12, w=8, generalInterrogation=true, interrogationAsduAddress=65535, interrogationTimeout=30000, readMode=cache, selectBeforeOperate=false, waitForTermination=false, terminationTimeout=30000, timeZone=UTC, originatorAddress=0}
+13:30:14.467 [nioEventLoopGroup-37-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Sending general interrogation to 65535
+13:30:14.509 [nioEventLoopGroup-37-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 confirmed
+13:30:14.510 [nioEventLoopGroup-37-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer CONFIRMATION_ACTIVATION_ACTCON for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:14.510 [nioEventLoopGroup-37-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 finished, 10 values cached
+13:30:14.510 [nioEventLoopGroup-37-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:14.595 [nioEventLoopGroup-37-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 connection closed
+13:30:14.596 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Channel is closed, closing worker Group also
+13:30:16.596 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Worker Group was closed successfully!
+]]></system-out>
+  </testcase>
+  <testcase name="stepCommandSendsOneCommandPerStep" classname="org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest" time="2.302">
+    <system-out><![CDATA[13:30:16.598 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Instantiating new PLC Driver Manager with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+13:30:16.598 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering available drivers...
+13:30:16.599 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)
+13:30:16.600 [main] INFO  o.a.p.j.t.tcp.TcpChannelFactory - Configuring Bootstrap with org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014TcpTransportConfiguration@433ae644
+13:30:16.602 [nioEventLoopGroup-38-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 data transfer started with Iec608705014Configuration{requestTimeout=4000, t1=15000, t2=10000, t3=20000, k=12, w=8, generalInterrogation=true, interrogationAsduAddress=65535, interrogationTimeout=30000, readMode=cache, selectBeforeOperate=false, waitForTermination=true, terminationTimeout=30000, timeZone=UTC, originatorAddress=0}
+13:30:16.602 [nioEventLoopGroup-38-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Sending general interrogation to 65535
+13:30:16.604 [nioEventLoopGroup-38-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 confirmed
+13:30:16.604 [nioEventLoopGroup-38-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer CONFIRMATION_ACTIVATION_ACTCON for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:16.605 [nioEventLoopGroup-38-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 finished, 10 values cached
+13:30:16.605 [nioEventLoopGroup-38-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:16.897 [nioEventLoopGroup-38-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 connection closed
+13:30:16.898 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Channel is closed, closing worker Group also
+13:30:18.898 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Worker Group was closed successfully!
+]]></system-out>
+  </testcase>
+  <testcase name="parameterOfMeasuredValues" classname="org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest" time="2.05">
+    <system-out><![CDATA[13:30:18.900 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Instantiating new PLC Driver Manager with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+13:30:18.900 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering available drivers...
+13:30:18.901 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)
+13:30:18.901 [main] INFO  o.a.p.j.t.tcp.TcpChannelFactory - Configuring Bootstrap with org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014TcpTransportConfiguration@22908698
+13:30:18.904 [nioEventLoopGroup-39-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 data transfer started with Iec608705014Configuration{requestTimeout=4000, t1=15000, t2=10000, t3=20000, k=12, w=8, generalInterrogation=true, interrogationAsduAddress=65535, interrogationTimeout=30000, readMode=cache, selectBeforeOperate=false, waitForTermination=false, terminationTimeout=30000, timeZone=UTC, originatorAddress=0}
+13:30:18.904 [nioEventLoopGroup-39-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Sending general interrogation to 65535
+13:30:18.946 [nioEventLoopGroup-39-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 confirmed
+13:30:18.946 [nioEventLoopGroup-39-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer CONFIRMATION_ACTIVATION_ACTCON for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:18.947 [nioEventLoopGroup-39-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 finished, 10 values cached
+13:30:18.947 [nioEventLoopGroup-39-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:18.948 [nioEventLoopGroup-39-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 connection closed
+13:30:18.948 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Channel is closed, closing worker Group also
+13:30:20.948 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Worker Group was closed successfully!
+]]></system-out>
+  </testcase>
+  <testcase name="selectBeforeOperate" classname="org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest" time="2.133">
+    <system-out><![CDATA[13:30:20.950 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Instantiating new PLC Driver Manager with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+13:30:20.950 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering available drivers...
+13:30:20.950 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)
+13:30:20.951 [main] INFO  o.a.p.j.t.tcp.TcpChannelFactory - Configuring Bootstrap with org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014TcpTransportConfiguration@6bb7e609
+13:30:20.954 [nioEventLoopGroup-40-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 data transfer started with Iec608705014Configuration{requestTimeout=4000, t1=15000, t2=10000, t3=20000, k=12, w=8, generalInterrogation=true, interrogationAsduAddress=65535, interrogationTimeout=30000, readMode=cache, selectBeforeOperate=false, waitForTermination=false, terminationTimeout=30000, timeZone=UTC, originatorAddress=0}
+13:30:20.954 [nioEventLoopGroup-40-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Sending general interrogation to 65535
+13:30:20.995 [nioEventLoopGroup-40-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 confirmed
+13:30:20.996 [nioEventLoopGroup-40-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer CONFIRMATION_ACTIVATION_ACTCON for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:20.996 [nioEventLoopGroup-40-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 finished, 10 values cached
+13:30:20.996 [nioEventLoopGroup-40-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:20.996 [nioEventLoopGroup-40-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Station refused the command to 1/410: cause CONFIRMATION_ACTIVATION_ACTCON, negative true
+13:30:21.081 [nioEventLoopGroup-40-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=SINGLE_COMMAND, asduAddress=1, objectAddress=410]
+13:30:21.081 [nioEventLoopGroup-40-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 connection closed
+13:30:21.081 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Channel is closed, closing worker Group also
+13:30:23.082 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Worker Group was closed successfully!
+]]></system-out>
+  </testcase>
+  <testcase name="counterInterrogationFillsTheCache" classname="org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest" time="2.094">
+    <system-out><![CDATA[13:30:23.084 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Instantiating new PLC Driver Manager with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+13:30:23.084 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering available drivers...
+13:30:23.084 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)
+13:30:23.086 [main] INFO  o.a.p.j.t.tcp.TcpChannelFactory - Configuring Bootstrap with org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014TcpTransportConfiguration@4dc2e04e
+13:30:23.089 [nioEventLoopGroup-41-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 data transfer started with Iec608705014Configuration{requestTimeout=4000, t1=15000, t2=10000, t3=20000, k=12, w=8, generalInterrogation=true, interrogationAsduAddress=65535, interrogationTimeout=30000, readMode=cache, selectBeforeOperate=false, waitForTermination=true, terminationTimeout=30000, timeZone=UTC, originatorAddress=0}
+13:30:23.089 [nioEventLoopGroup-41-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Sending general interrogation to 65535
+13:30:23.130 [nioEventLoopGroup-41-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 confirmed
+13:30:23.131 [nioEventLoopGroup-41-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer CONFIRMATION_ACTIVATION_ACTCON for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:23.131 [nioEventLoopGroup-41-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 finished, 10 values cached
+13:30:23.131 [nioEventLoopGroup-41-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:23.176 [nioEventLoopGroup-41-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 connection closed
+13:30:23.176 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Channel is closed, closing worker Group also
+13:30:25.177 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Worker Group was closed successfully!
+]]></system-out>
+  </testcase>
+  <testcase name="timeTagOfMonitoringDataInTheConfiguredZone" classname="org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest" time="2.049">
+    <system-out><![CDATA[13:30:25.179 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Instantiating new PLC Driver Manager with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+13:30:25.179 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering available drivers...
+13:30:25.180 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)
+13:30:25.181 [main] INFO  o.a.p.j.t.tcp.TcpChannelFactory - Configuring Bootstrap with org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014TcpTransportConfiguration@61252eef
+13:30:25.183 [nioEventLoopGroup-42-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 data transfer started with Iec608705014Configuration{requestTimeout=4000, t1=15000, t2=10000, t3=20000, k=12, w=8, generalInterrogation=true, interrogationAsduAddress=65535, interrogationTimeout=30000, readMode=cache, selectBeforeOperate=false, waitForTermination=false, terminationTimeout=30000, timeZone=Europe/Moscow, originatorAddress=0}
+13:30:25.183 [nioEventLoopGroup-42-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Sending general interrogation to 65535
+13:30:25.225 [nioEventLoopGroup-42-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 confirmed
+13:30:25.225 [nioEventLoopGroup-42-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer CONFIRMATION_ACTIVATION_ACTCON for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:25.226 [nioEventLoopGroup-42-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 finished, 10 values cached
+13:30:25.226 [nioEventLoopGroup-42-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:25.226 [nioEventLoopGroup-42-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 connection closed
+13:30:25.227 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Channel is closed, closing worker Group also
+13:30:27.227 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Worker Group was closed successfully!
+]]></system-out>
+  </testcase>
+  <testcase name="readsDoublePointAsCode" classname="org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest" time="2.049">
+    <system-out><![CDATA[13:30:27.229 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Instantiating new PLC Driver Manager with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+13:30:27.229 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering available drivers...
+13:30:27.229 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)
+13:30:27.230 [main] INFO  o.a.p.j.t.tcp.TcpChannelFactory - Configuring Bootstrap with org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014TcpTransportConfiguration@44ee788f
+13:30:27.233 [nioEventLoopGroup-43-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 data transfer started with Iec608705014Configuration{requestTimeout=4000, t1=15000, t2=10000, t3=20000, k=12, w=8, generalInterrogation=true, interrogationAsduAddress=65535, interrogationTimeout=30000, readMode=cache, selectBeforeOperate=false, waitForTermination=true, terminationTimeout=30000, timeZone=UTC, originatorAddress=0}
+13:30:27.233 [nioEventLoopGroup-43-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Sending general interrogation to 65535
+13:30:27.234 [nioEventLoopGroup-43-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 confirmed
+13:30:27.234 [nioEventLoopGroup-43-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer CONFIRMATION_ACTIVATION_ACTCON for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:27.275 [nioEventLoopGroup-43-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 finished, 10 values cached
+13:30:27.275 [nioEventLoopGroup-43-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:27.276 [nioEventLoopGroup-43-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 connection closed
+13:30:27.276 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Channel is closed, closing worker Group also
+13:30:29.276 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Worker Group was closed successfully!
+]]></system-out>
+  </testcase>
+  <testcase name="clockSynchronisation" classname="org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest" time="2.093">
+    <system-out><![CDATA[13:30:29.279 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Instantiating new PLC Driver Manager with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+13:30:29.279 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering available drivers...
+13:30:29.279 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)
+13:30:29.280 [main] INFO  o.a.p.j.t.tcp.TcpChannelFactory - Configuring Bootstrap with org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014TcpTransportConfiguration@3432a612
+13:30:29.283 [nioEventLoopGroup-44-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 data transfer started with Iec608705014Configuration{requestTimeout=4000, t1=15000, t2=10000, t3=20000, k=12, w=8, generalInterrogation=true, interrogationAsduAddress=65535, interrogationTimeout=30000, readMode=cache, selectBeforeOperate=false, waitForTermination=false, terminationTimeout=30000, timeZone=UTC, originatorAddress=0}
+13:30:29.283 [nioEventLoopGroup-44-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Sending general interrogation to 65535
+13:30:29.285 [nioEventLoopGroup-44-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 confirmed
+13:30:29.285 [nioEventLoopGroup-44-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer CONFIRMATION_ACTIVATION_ACTCON for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:29.285 [nioEventLoopGroup-44-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 finished, 10 values cached
+13:30:29.285 [nioEventLoopGroup-44-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:29.369 [nioEventLoopGroup-44-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 connection closed
+13:30:29.370 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Channel is closed, closing worker Group also
+13:30:31.370 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Worker Group was closed successfully!
+]]></system-out>
+  </testcase>
+  <testcase name="doubleCommand" classname="org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest" time="2.093">
+    <system-out><![CDATA[13:30:31.372 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Instantiating new PLC Driver Manager with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+13:30:31.372 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering available drivers...
+13:30:31.373 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)
+13:30:31.374 [main] INFO  o.a.p.j.t.tcp.TcpChannelFactory - Configuring Bootstrap with org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014TcpTransportConfiguration@390d47db
+13:30:31.377 [nioEventLoopGroup-45-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 data transfer started with Iec608705014Configuration{requestTimeout=4000, t1=15000, t2=10000, t3=20000, k=12, w=8, generalInterrogation=true, interrogationAsduAddress=65535, interrogationTimeout=30000, readMode=cache, selectBeforeOperate=false, waitForTermination=false, terminationTimeout=30000, timeZone=UTC, originatorAddress=0}
+13:30:31.377 [nioEventLoopGroup-45-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Sending general interrogation to 65535
+13:30:31.419 [nioEventLoopGroup-45-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 confirmed
+13:30:31.419 [nioEventLoopGroup-45-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer CONFIRMATION_ACTIVATION_ACTCON for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:31.420 [nioEventLoopGroup-45-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 finished, 10 values cached
+13:30:31.420 [nioEventLoopGroup-45-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:31.420 [nioEventLoopGroup-45-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=DOUBLE_COMMAND, asduAddress=1, objectAddress=500]
+13:30:31.462 [nioEventLoopGroup-45-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=DOUBLE_COMMAND, asduAddress=1, objectAddress=500]
+13:30:31.462 [main] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Cannot write 1 to 1/500:C_DC_NA_1: a double command takes a boolean (true = on) or "ON"/"OFF", was 1
+13:30:31.463 [nioEventLoopGroup-45-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 connection closed
+13:30:31.463 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Channel is closed, closing worker Group also
+13:30:33.463 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Worker Group was closed successfully!
+]]></system-out>
+  </testcase>
+  <testcase name="waitsForTermination" classname="org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest" time="2.609">
+    <system-out><![CDATA[13:30:33.465 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Instantiating new PLC Driver Manager with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+13:30:33.465 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering available drivers...
+13:30:33.466 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)
+13:30:33.466 [main] INFO  o.a.p.j.t.tcp.TcpChannelFactory - Configuring Bootstrap with org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014TcpTransportConfiguration@18fb1034
+13:30:33.469 [nioEventLoopGroup-46-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 data transfer started with Iec608705014Configuration{requestTimeout=4000, t1=15000, t2=10000, t3=20000, k=12, w=8, generalInterrogation=true, interrogationAsduAddress=65535, interrogationTimeout=30000, readMode=cache, selectBeforeOperate=false, waitForTermination=true, terminationTimeout=30000, timeZone=UTC, originatorAddress=0}
+13:30:33.469 [nioEventLoopGroup-46-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Sending general interrogation to 65535
+13:30:33.469 [nioEventLoopGroup-46-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 confirmed
+13:30:33.469 [nioEventLoopGroup-46-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer CONFIRMATION_ACTIVATION_ACTCON for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:33.511 [nioEventLoopGroup-46-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 finished, 10 values cached
+13:30:33.511 [nioEventLoopGroup-46-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:34.072 [nioEventLoopGroup-46-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 connection closed
+13:30:34.073 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Channel is closed, closing worker Group also
+13:30:36.073 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Worker Group was closed successfully!
+]]></system-out>
+  </testcase>
+  <testcase name="stepCommandStopsAtTheFirstRefusedStep" classname="org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest" time="2.134">
+    <system-out><![CDATA[13:30:36.076 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Instantiating new PLC Driver Manager with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+13:30:36.076 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering available drivers...
+13:30:36.076 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)
+13:30:36.077 [main] INFO  o.a.p.j.t.tcp.TcpChannelFactory - Configuring Bootstrap with org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014TcpTransportConfiguration@30ab1b4f
+13:30:36.080 [nioEventLoopGroup-47-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 data transfer started with Iec608705014Configuration{requestTimeout=4000, t1=15000, t2=10000, t3=20000, k=12, w=8, generalInterrogation=true, interrogationAsduAddress=65535, interrogationTimeout=30000, readMode=cache, selectBeforeOperate=false, waitForTermination=false, terminationTimeout=30000, timeZone=UTC, originatorAddress=0}
+13:30:36.080 [nioEventLoopGroup-47-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Sending general interrogation to 65535
+13:30:36.121 [nioEventLoopGroup-47-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 confirmed
+13:30:36.121 [nioEventLoopGroup-47-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer CONFIRMATION_ACTIVATION_ACTCON for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:36.122 [nioEventLoopGroup-47-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 finished, 10 values cached
+13:30:36.122 [nioEventLoopGroup-47-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:36.122 [nioEventLoopGroup-47-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=REGULATING_STEP_COMMAND, asduAddress=1, objectAddress=630]
+13:30:36.164 [nioEventLoopGroup-47-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=REGULATING_STEP_COMMAND, asduAddress=1, objectAddress=630]
+13:30:36.206 [nioEventLoopGroup-47-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Station refused the command to 1/630:C_RC_NA_1: cause CONFIRMATION_ACTIVATION_ACTCON, negative true
+13:30:36.206 [nioEventLoopGroup-47-1] WARN  o.a.p.j.i.r.p.Iec608705104Protocol - Step command to 1/630:C_RC_NA_1: 2 of 5 steps executed, then REMOTE_ERROR
+13:30:36.207 [nioEventLoopGroup-47-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 connection closed
+13:30:36.207 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Channel is closed, closing worker Group also
+13:30:38.207 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Worker Group was closed successfully!
+]]></system-out>
+  </testcase>
+  <testcase name="missingTerminationTimesOut" classname="org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest" time="2.55">
+    <system-out><![CDATA[13:30:38.209 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Instantiating new PLC Driver Manager with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+13:30:38.209 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering available drivers...
+13:30:38.210 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)
+13:30:38.211 [main] INFO  o.a.p.j.t.tcp.TcpChannelFactory - Configuring Bootstrap with org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014TcpTransportConfiguration@e8fabad
+13:30:38.214 [nioEventLoopGroup-48-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 data transfer started with Iec608705014Configuration{requestTimeout=4000, t1=15000, t2=10000, t3=20000, k=12, w=8, generalInterrogation=true, interrogationAsduAddress=65535, interrogationTimeout=30000, readMode=cache, selectBeforeOperate=false, waitForTermination=true, terminationTimeout=500, timeZone=UTC, originatorAddress=0}
+13:30:38.214 [nioEventLoopGroup-48-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Sending general interrogation to 65535
+13:30:38.255 [nioEventLoopGroup-48-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 confirmed
+13:30:38.255 [nioEventLoopGroup-48-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer CONFIRMATION_ACTIVATION_ACTCON for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:38.256 [nioEventLoopGroup-48-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 finished, 10 values cached
+13:30:38.256 [nioEventLoopGroup-48-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:38.756 [nioEventLoopGroup-48-1] WARN  o.a.p.j.i.r.p.Iec608705104Protocol - No ACT_TERM from the station to the command to 1/620:C_RC_NA_1 within 500 ms
+13:30:38.757 [nioEventLoopGroup-48-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 connection closed
+13:30:38.757 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Channel is closed, closing worker Group also
+13:30:40.757 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Worker Group was closed successfully!
+]]></system-out>
+  </testcase>
+  <testcase name="withoutWaitingTerminationDoesNotMatter" classname="org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest" time="2.048">
+    <system-out><![CDATA[13:30:40.759 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Instantiating new PLC Driver Manager with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+13:30:40.759 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering available drivers...
+13:30:40.760 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)
+13:30:40.761 [main] INFO  o.a.p.j.t.tcp.TcpChannelFactory - Configuring Bootstrap with org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014TcpTransportConfiguration@418b3215
+13:30:40.763 [nioEventLoopGroup-49-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 data transfer started with Iec608705014Configuration{requestTimeout=4000, t1=15000, t2=10000, t3=20000, k=12, w=8, generalInterrogation=true, interrogationAsduAddress=65535, interrogationTimeout=30000, readMode=cache, selectBeforeOperate=false, waitForTermination=false, terminationTimeout=30000, timeZone=UTC, originatorAddress=0}
+13:30:40.763 [nioEventLoopGroup-49-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Sending general interrogation to 65535
+13:30:40.804 [nioEventLoopGroup-49-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 confirmed
+13:30:40.804 [nioEventLoopGroup-49-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer CONFIRMATION_ACTIVATION_ACTCON for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:40.805 [nioEventLoopGroup-49-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 finished, 10 values cached
+13:30:40.805 [nioEventLoopGroup-49-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:40.805 [nioEventLoopGroup-49-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 connection closed
+13:30:40.806 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Channel is closed, closing worker Group also
+13:30:42.806 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Worker Group was closed successfully!
+]]></system-out>
+  </testcase>
+  <testcase name="timeTagUsesTheConfiguredZone" classname="org.apache.plc4x.java.iec608705104.Iec608705104CommandsDriverTest" time="2.009">
+    <system-out><![CDATA[13:30:42.808 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Instantiating new PLC Driver Manager with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+13:30:42.808 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering available drivers...
+13:30:42.809 [main] INFO  o.a.p.java.DefaultPlcDriverManager - Registering driver for Protocol iec-60870-5-104 (IEC 60870-5-104-LSP)
+13:30:42.810 [main] INFO  o.a.p.j.t.tcp.TcpChannelFactory - Configuring Bootstrap with org.apache.plc4x.java.iec608705104.readwrite.configuration.Iec608705014TcpTransportConfiguration@4785f176
+13:30:42.813 [nioEventLoopGroup-50-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 data transfer started with Iec608705014Configuration{requestTimeout=4000, t1=15000, t2=10000, t3=20000, k=12, w=8, generalInterrogation=true, interrogationAsduAddress=65535, interrogationTimeout=30000, readMode=cache, selectBeforeOperate=false, waitForTermination=false, terminationTimeout=30000, timeZone=Europe/Moscow, originatorAddress=0}
+13:30:42.813 [nioEventLoopGroup-50-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Sending general interrogation to 65535
+13:30:42.814 [nioEventLoopGroup-50-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 confirmed
+13:30:42.814 [nioEventLoopGroup-50-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer CONFIRMATION_ACTIVATION_ACTCON for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:42.814 [nioEventLoopGroup-50-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - General interrogation of 1 finished, 10 values cached
+13:30:42.814 [nioEventLoopGroup-50-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=INTERROGATION_COMMAND, asduAddress=1, objectAddress=0]
+13:30:42.815 [nioEventLoopGroup-50-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - Unexpected command answer TERMINATION_ACTIVATION_ACTTERM for CommandKey[type=MEASURED_VALUE_SHORT_FLOATING_POINT_NUMBER_COMMAND_WITH_TIME_TAG_CP56TIME2A, asduAddress=1, objectAddress=300]
+13:30:42.815 [nioEventLoopGroup-50-1] DEBUG o.a.p.j.i.r.p.Iec608705104Protocol - IEC 104 connection closed
+13:30:42.815 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Channel is closed, closing worker Group also
+13:30:44.815 [main] INFO  o.a.p.j.s.c.NettyChannelFactory - Worker Group was closed successfully!
+]]></system-out>
+  </testcase>
+</testsuite>
